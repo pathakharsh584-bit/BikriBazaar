@@ -1,0 +1,1 @@
+//Single Ad detail maps to products folder

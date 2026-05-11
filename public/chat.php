@@ -1,0 +1,1 @@
+//Messaging UI maps to chat folder
