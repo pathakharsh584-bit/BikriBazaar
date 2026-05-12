@@ -1,4 +1,4 @@
-//This file will load files from auth folder responsible for register page view<?php
+<?php
 
 require_once '../modules/auth/register_view.php';
 
