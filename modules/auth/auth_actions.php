@@ -1,30 +1,70 @@
 <?php
 
+function validatePassword($password)
+{
+    if(strlen($password) < 8){
+        return "Password must be at least 8 characters.";
+    }
+
+    if(preg_match('/\s/', $password)){
+        return "Password must not contain spaces.";
+    }
+
+    if(!preg_match('/[A-Z]/', $password)){
+        return "Password must contain uppercase letter.";
+    }
+
+    if(!preg_match('/[a-z]/', $password)){
+        return "Password must contain lowercase letter.";
+    }
+
+    if(!preg_match('/[0-9]/', $password)){
+        return "Password must contain number.";
+    }
+
+    if(!preg_match('/[^A-Za-z0-9]/', $password)){
+        return "Password must contain special character.";
+    }
+
+    return true;
+}
+
 function registerUser($conn)
 {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
+    $confirm_password = trim($_POST['confirm_password']);
     $phone = trim($_POST['phone']);
     $city = trim($_POST['city']);
 
-    $checkEmail = "SELECT * FROM users WHERE email = '$email'";
-    $emailResult = mysqli_query($conn, $checkEmail);
+    if($password !== $confirm_password){
+        return "Passwords do not match!";
+    }
 
-    if(mysqli_num_rows($emailResult) > 0){
+    $validation = validatePassword($password);
+
+    if($validation !== true){
+        return $validation;
+    }
+
+    $checkEmail = "SELECT * FROM users WHERE email='$email'";
+    $result = mysqli_query($conn, $checkEmail);
+
+    if(mysqli_num_rows($result) > 0){
         return "Email already exists!";
     }
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO users (name, email, password, phone, city)
-            VALUES ('$name', '$email', '$hashedPassword', '$phone', '$city')";
+    $sql = "INSERT INTO users(name,email,password,phone,city)
+            VALUES('$name','$email','$hashedPassword','$phone','$city')";
 
     if(mysqli_query($conn, $sql)){
         return "Registration Successful!";
-    } else {
-        return "Registration Failed!";
     }
+
+    return "Registration Failed!";
 }
 
 function loginUser($conn)
@@ -32,7 +72,7 @@ function loginUser($conn)
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    $sql = "SELECT * FROM users WHERE email = '$email'";
+    $sql = "SELECT * FROM users WHERE email='$email'";
 
     $result = mysqli_query($conn, $sql);
 
