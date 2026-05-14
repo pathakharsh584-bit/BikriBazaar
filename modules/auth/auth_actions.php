@@ -86,7 +86,7 @@ function loginUser($conn)
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_email'] = $user['email'];
 
-            header("Location: /BikriBazaar/public/index.php");
+            header("Location: " . BASE_URL . "index.php");
             exit();
 
         } else {

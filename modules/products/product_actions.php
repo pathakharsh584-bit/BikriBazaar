@@ -24,7 +24,8 @@ function postProduct($conn)
             ('$user_id', '$title', '$description', '$price', '$location', '$category', '$imageName')";
 
     if(mysqli_query($conn, $sql)){
-        return "Product Posted Successfully!";
+        header("Location: " . BASE_URL . "index.php");
+        exit();
     } else {
         return "Failed To Post Product!";
     }

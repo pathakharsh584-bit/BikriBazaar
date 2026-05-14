@@ -2,12 +2,13 @@
 
 session_start();
 
+require_once __DIR__ . '/../../shared/db.php';
+
 if(!isset($_SESSION['user_id'])){
-    header("Location: /BikriBazaar/public/login.php");
+    header("Location: " . BASE_URL . "login.php");
     exit();
 }
 
-require_once __DIR__ . '/../../shared/db.php';
 
 if(!isset($_GET['id'])){
     die("Product Not Found");
@@ -47,8 +48,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
                WHERE id='$product_id'";
 
     if(mysqli_query($conn, $update)){
-
-        header("Location: /BikriBazaar/public/my-ads.php");
+        header("Location: " . BASE_URL . "my-ads.php");
         exit();
 
     } else {

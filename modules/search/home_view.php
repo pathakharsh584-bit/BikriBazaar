@@ -42,7 +42,7 @@ $result = mysqli_query($conn, $sql);
 
     <link
         rel="stylesheet"
-        href="http://localhost/BikriBazaar/public/assets/css/style.css"
+        href="assets/css/style.css"
     >
 
 </head>

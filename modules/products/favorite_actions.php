@@ -5,7 +5,7 @@ session_start();
 require_once __DIR__ . '/../../shared/db.php';
 
 if(!isset($_SESSION['user_id'])){
-    header("Location: /BikriBazaar/public/login.php");
+    header("Location: " . BASE_URL . "login.php");
     exit();
 }
 
@@ -30,7 +30,7 @@ if(isset($_GET['product_id'])){
     }
 }
 
-header("Location: /BikriBazaar/public/favorites.php");
+header("Location: " . BASE_URL . "favorites.php");
 exit();
 
 ?>
