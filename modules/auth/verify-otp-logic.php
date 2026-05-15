@@ -14,8 +14,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $otp = trim($_POST['otp']);
 
-    $sql = "SELECT * FROM users
-            WHERE email='$email'
+    
+    $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+
+    $sql = "SELECT * FROM users 
+            WHERE email='$email' 
             AND otp='$otp'";
 
     $result = mysqli_query($conn, $sql);
@@ -25,22 +28,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $user = mysqli_fetch_assoc($result);
 
         $expiry_time = strtotime($user['otp_expiry']);
-
         $current_time = time();
 
         if($current_time <= $expiry_time){
+            
+            $redirect_url = BASE_URL . "reset-password.php?email=" . urlencode($email);
+            
+            if ($is_ajax) {
+                echo json_encode(['status' => 'success', 'redirect' => $redirect_url]);
+                exit();
+            }
 
-            header("Location: " . BASE_URL . "reset-password.php?email=" . urlencode($email));
+            header("Location: " . $redirect_url);
             exit();
 
         } else {
-
-            $message = "OTP Expired!";
+            $msg = "OTP Expired!";
+            if ($is_ajax) { echo json_encode(['status' => 'error', 'message' => $msg]); exit(); }
+            $message = $msg;
         }
 
     } else {
-
-        $message = "Invalid OTP!";
+        $msg = "Invalid OTP!";
+        if ($is_ajax) { echo json_encode(['status' => 'error', 'message' => $msg]); exit(); }
+        $message = $msg;
     }
 }
 
@@ -49,11 +60,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!DOCTYPE html>
 <html>
 <head>
-
     <title>Verify OTP</title>
-
     <style>
-
         body{
             font-family:Arial;
             background:#f5f5f5;
@@ -61,8 +69,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             justify-content:center;
             align-items:center;
             height:100vh;
+            margin: 0;
         }
-
         .box{
             width:400px;
             background:white;
@@ -70,48 +78,114 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             border-radius:10px;
             box-shadow:0px 0px 10px rgba(0,0,0,0.1);
         }
-
         input,button{
             width:100%;
             padding:12px;
             margin-top:15px;
+            box-sizing: border-box; 
         }
-
+        button {
+            background-color: #002f34;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background-color: #55777a;
+            cursor: not-allowed;
+        }
         .message{
-            color:red;
+            padding: 10px;
+            border-radius: 5px;
             margin-bottom:10px;
             font-weight:bold;
+            text-align: center;
+            display: none; 
         }
-
     </style>
-
 </head>
 <body>
 
 <div class="box">
-
     <h2>Verify OTP</h2>
 
-    <div class="message">
+    <div id="ajax-message" class="message" style="<?php echo ($message != '') ? 'display:block; background:#fee2e2; color:#b91c1c;' : 'display:none;'; ?>">
         <?php echo $message; ?>
     </div>
 
-    <form method="POST">
-
-        <input
-            type="text"
-            name="otp"
-            placeholder="Enter OTP"
+    <form method="POST" id="otpForm">
+        <input 
+            type="text" 
+            name="otp" 
+            placeholder="Enter OTP" 
             required
         >
-
-        <button type="submit">
+        
+        <button type="submit" id="submitBtn">
             Verify OTP
         </button>
-
     </form>
-
 </div>
+
+<script>
+document.getElementById('otpForm').addEventListener('submit', function(e) {
+    e.preventDefault(); 
+
+    const submitBtn = document.getElementById('submitBtn');
+    const messageBox = document.getElementById('ajax-message');
+    
+    
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Verifying...";
+    submitBtn.disabled = true;
+    messageBox.style.display = 'none'; 
+
+    const formData = new FormData(this);
+
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+
+            messageBox.innerHTML = "OTP Verified! Redirecting...";
+            messageBox.style.background = "#dcfce7";
+            messageBox.style.color = "#15803d";
+            messageBox.style.display = "block";
+            
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 1000);
+        } else {
+
+            messageBox.innerHTML = data.message;
+            messageBox.style.background = "#fee2e2";
+            messageBox.style.color = "#b91c1c";
+            messageBox.style.display = "block";
+            
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        messageBox.innerHTML = "An unexpected error occurred.";
+        messageBox.style.background = "#fee2e2";
+        messageBox.style.color = "#b91c1c";
+        messageBox.style.display = "block";
+        
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
+    });
+});
+</script>
 
 </body>
 </html>

@@ -131,70 +131,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
 <div class="auth-wrapper">
-
     <div class="auth-card">
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Login to continue using BikriBazaar.</p>
 
-        <h1 class="auth-title">
-            Welcome Back
-        </h1>
+        <div id="ajax-message" class="message" style="<?php echo ($message != '') ? 'display:block;' : 'display:none;'; ?>">
+            <?php echo $message; ?>
+        </div>
 
-        <p class="auth-subtitle">
-            Login to continue using BikriBazaar.
-        </p>
-
-        <?php if($message != "") { ?>
-
-            <div class="message">
-                <?php echo $message; ?>
-            </div>
-
-        <?php } ?>
-
-        <form method="POST">
-
+        <form method="POST" id="loginForm">
             <div class="form-group">
-
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter Email"
-                    required
-                >
-
+                <input type="email" name="email" placeholder="Enter Email" required>
             </div>
-
             <div class="form-group">
-
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Enter Password"
-                    required
-                >
-
+                <input type="password" name="password" placeholder="Enter Password" required>
             </div>
-
-            <button class="auth-btn" type="submit">
+            <button class="auth-btn" id="loginBtn" type="submit">
                 Login Now
             </button>
-
         </form>
 
         <div class="auth-links">
-
-            <a href="register.php">
-                Create New Account
-            </a>
-
-            <a href="forgot-password.php">
-                Forgot Password?
-            </a>
-
+            <a href="register.php">Create New Account</a>
+            <a href="forgot-password.php">Forgot Password?</a>
         </div>
-
     </div>
-
 </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Stop the page from reloading!
+
+    const submitBtn = document.getElementById('loginBtn');
+    const messageBox = document.getElementById('ajax-message');
+    
+    // Change button state to show it's working
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Logging in...";
+    submitBtn.disabled = true;
+
+    // Package the form data
+    const formData = new FormData(this);
+
+    // Send the AJAX request to the current page
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest' // Tell PHP this is AJAX
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Instantly redirect to dashboard/home on success
+            window.location.href = data.redirect;
+        } else {
+            // Show the error message without reloading
+            messageBox.innerHTML = data.message;
+            messageBox.style.display = 'block';
+            
+            // Reset the button
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        submitBtn.innerText = "Error occurred";
+        submitBtn.disabled = false;
+    });
+});
+</script>
 
 </body>
 </html>
