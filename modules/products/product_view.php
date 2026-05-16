@@ -1,8 +1,8 @@
 <?php
-
 session_start();
-
 require_once __DIR__ . '/../../shared/db.php';
+// Assuming BASE_URL is defined in a config file, if not, define it here for the chat link
+// define('BASE_URL', '/BikriBazaar/public/');
 
 if(!isset($_GET['id'])){
     die("Product Not Found");
@@ -10,7 +10,11 @@ if(!isset($_GET['id'])){
 
 $product_id = intval($_GET['id']);
 
-$sql = "SELECT * FROM products WHERE id = '$product_id'";
+// UPDATED QUERY: We use a LEFT JOIN to grab the seller's name and join date from the users table
+$sql = "SELECT p.*, u.name as seller_name, u.created_at as seller_join_date 
+        FROM products p 
+        LEFT JOIN users u ON p.user_id = u.id 
+        WHERE p.id = '$product_id'";
 $result = mysqli_query($conn, $sql);
 
 if(mysqli_num_rows($result) == 0){
@@ -19,7 +23,7 @@ if(mysqli_num_rows($result) == 0){
 
 $product = mysqli_fetch_assoc($result);
 
-// Check if the current user has already favorited this product
+// Check if favorited
 $is_favorited = false;
 if(isset($_SESSION['user_id'])){
     $user_id = intval($_SESSION['user_id']);
@@ -29,7 +33,6 @@ if(isset($_SESSION['user_id'])){
         $is_favorited = true;
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -37,150 +40,143 @@ if(isset($_SESSION['user_id'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $product['title']; ?></title>
+    <title><?php echo htmlspecialchars($product['title']); ?> - BikriBazaar</title>
 
     <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Arial, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f2f4f5; color: #002f34; }
+
+        /* Navbar */
+        .navbar { background: #002f34; padding: 15px 40px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; font-size: 16px; font-weight: bold; margin-left: 20px; }
+
+        /* Layout Grid */
+        .layout-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Left side is twice as big as right sidebar */
+            gap: 25px;
+            align-items: start;
         }
 
-        body{
-            background:#f5f5f5;
-        }
-
-        .navbar{
-            background:#002f34;
-            padding:15px 40px;
-            color:white;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        }
-
-        .navbar a{
-            color:white;
-            text-decoration:none;
-            font-size:18px;
-            font-weight:bold;
-            margin-left:15px;
-        }
-
-        .container{
-            width:90%;
-            max-width:1000px;
-            margin:40px auto;
-            background:white;
-            border-radius:10px;
-            overflow:hidden;
-            box-shadow:0px 0px 10px rgba(0,0,0,0.1);
-        }
-
-        .product-image img{
-            width:100%;
-            height:500px;
-            object-fit:cover;
-        }
-
-        .product-details{
-            padding:30px;
-        }
-
-        .price{
-            font-size:36px;
-            font-weight:bold;
-            margin-bottom:20px;
-        }
-
-        .title{
-            font-size:28px;
-            margin-bottom:20px;
-        }
-
-        .description{
-            font-size:18px;
-            line-height:1.6;
-            margin-bottom:20px;
-        }
-
-        .info{
-            font-size:18px;
-            margin-bottom:10px;
-            color:#555;
-        }
-
-        /* Updated to support Button element */
-        .favorite-btn{
-            display:inline-block;
-            margin-top:20px;
-            padding:12px 25px;
-            color:white;
-            border:none;
-            border-radius:5px;
-            font-size:18px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-add {
-            background: red;
-        }
+        /* --- LEFT COLUMN: Product Content --- */
+        .main-content { display: flex; flex-direction: column; gap: 20px; }
         
-        .btn-remove {
-            background: #555;
-        }
+        .image-card { background: black; border-radius: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 500px; }
+        .image-card img { width: 100%; height: 100%; object-fit: contain; }
 
+        .details-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .details-card h3 { font-size: 24px; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .description { font-size: 16px; line-height: 1.6; color: #4b5563; }
+        .metadata { margin-top: 20px; display: flex; gap: 30px; color: #6b7280; font-size: 14px; }
+
+        /* --- RIGHT COLUMN: Sidebar Action Hub --- */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+        .price-card, .seller-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        .price-card .price { font-size: 38px; font-weight: 800; margin-bottom: 10px; }
+        .price-card .title { font-size: 18px; color: #4b5563; margin-bottom: 20px; }
+        .price-card .location-row { display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 15px;}
+
+        /* Seller Info */
+        .seller-info { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .seller-avatar { width: 60px; height: 60px; border-radius: 50%; background: #002f34; color: white; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; text-transform: uppercase; }
+        .seller-name { font-size: 18px; font-weight: bold; }
+        .seller-date { font-size: 13px; color: #6b7280; }
+
+        /* Buttons */
+        .btn { display: block; width: 100%; text-align: center; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; text-decoration: none; }
+        
+        .btn-chat { background: #002f34; color: white; border: 2px solid #002f34; }
+        .btn-chat:hover { background: white; color: #002f34; }
+        
+        .btn-edit { background: white; color: #002f34; border: 2px solid #002f34; }
+        .btn-edit:hover { background: #f3f4f6; }
+
+        .btn-fav-add { background: white; color: #002f34; border: 2px solid #002f34; margin-top: 10px; }
+        .btn-fav-add:hover { background: #f3f4f6; }
+        .btn-fav-remove { background: #002f34; color: white; border: 2px solid #002f34; margin-top: 10px; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 850px) {
+            .layout-container { grid-template-columns: 1fr; }
+            .image-card { height: 350px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="navbar">
+    <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">BikriBazaar</div>
     <div>
         <a href="index.php">Home</a>
-    </div>
-    <div>
         <a href="favorites.php">Favorites</a>
     </div>
 </div>
 
-<div class="container">
+<div class="layout-container">
 
-    <div class="product-image">
-        <img src="../uploads/products/<?php echo $product['image']; ?>" alt="Product Image">
+    <div class="main-content">
+        <div class="image-card">
+            <img src="/olx/public/uploads/products/<?php echo $product['image']; ?>" alt="Product Image">
+        </div>
+
+        <div class="details-card">
+            <h3>Description</h3>
+            <div class="description">
+                <?php echo nl2br(htmlspecialchars($product['description'])); ?>
+            </div>
+            
+            <div class="metadata">
+                <div>📂 Category: <strong><?php echo htmlspecialchars($product['category']); ?></strong></div>
+                <div>🆔 Ad ID: <strong><?php echo $product['id']; ?></strong></div>
+            </div>
+        </div>
     </div>
 
-    <div class="product-details">
+    <div class="sidebar">
+        
+        <div class="price-card">
+            <div class="price">₹ <?php echo number_format($product['price']); ?></div>
+            <div class="title"><?php echo htmlspecialchars($product['title']); ?></div>
+            
+            <div class="location-row">
+                <span>📍 <?php echo htmlspecialchars($product['location']); ?></span>
+                <span>📅 <?php echo date("d M Y", strtotime($product['created_at'])); ?></span>
+            </div>
 
-        <div class="price">
-            ₹ <?php echo number_format($product['price']); ?>
+            <button id="favBtn" class="btn <?php echo $is_favorited ? 'btn-fav-remove' : 'btn-fav-add'; ?>" onclick="toggleFavorite(<?php echo $product['id']; ?>)">
+                <?php echo $is_favorited ? '🤍 Remove from Favorites' : '❤️ Add to Favorites'; ?>
+            </button>
         </div>
 
-        <div class="title">
-            <?php echo $product['title']; ?>
+        <div class="seller-card">
+            <div class="seller-info">
+                <div class="seller-avatar">
+                    <?php echo substr(htmlspecialchars($product['seller_name'] ?? 'U'), 0, 1); ?>
+                </div>
+                <div>
+                    <div class="seller-name"><?php echo htmlspecialchars($product['seller_name'] ?? 'Unknown Seller'); ?></div>
+                    <div class="seller-date">Member since <?php echo date("M Y", strtotime($product['seller_join_date'] ?? $product['created_at'])); ?></div>
+                </div>
+            </div>
+
+            <?php if (!isset($_SESSION['user_id'])): ?>
+                <a href="../auth/login.php" class="btn btn-chat">🔒 Login to Chat</a>
+            
+            <?php elseif ($_SESSION['user_id'] == $product['user_id']): ?>
+                <a href="edit_product.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">✏️ Edit Your Ad</a>
+            
+            <?php else: ?>
+                <a href="<?php echo BASE_URL; ?>chat.php?product_id=<?php echo $product['id']; ?>&receiver_id=<?php echo $product['user_id']; ?>" class="btn btn-chat">
+                    💬 Chat with Seller
+                </a>
+            <?php endif; ?>
+            
         </div>
-
-        <div class="description">
-            <?php echo nl2br($product['description']); ?>
-        </div>
-
-        <div class="info">
-            📍 Location: <?php echo $product['location']; ?>
-        </div>
-
-        <div class="info">
-            📂 Category: <?php echo $product['category']; ?>
-        </div>
-
-        <button 
-            id="favBtn"
-            class="favorite-btn <?php echo $is_favorited ? 'btn-remove' : 'btn-add'; ?>"
-            onclick="toggleFavorite(<?php echo $product['id']; ?>)"
-        >
-            <?php echo $is_favorited ? '🤍 Remove From Favorites' : '❤️ Add To Favorites'; ?>
-        </button>
-
     </div>
 
 </div>
@@ -188,13 +184,12 @@ if(isset($_SESSION['user_id'])){
 <script>
 function toggleFavorite(productId) {
     const btn = document.getElementById('favBtn');
-    
-    // Optional: Visual feedback while processing
     const originalText = btn.innerHTML;
+    const isAdding = btn.classList.contains('btn-fav-add');
+    
     btn.innerHTML = '⏳ Processing...';
     btn.disabled = true;
 
-    // Send the AJAX request to your newly updated logic file
     fetch(`../modules/products/favorite_actions.php?product_id=${productId}`, {
         method: 'GET',
         headers: {
@@ -206,22 +201,19 @@ function toggleFavorite(productId) {
         btn.disabled = false;
 
         if (data.status === 'unauthorized') {
-            // User isn't logged in, redirect them
             window.location.href = data.redirect;
             return;
         }
 
         if (data.status === 'success') {
-            // Toggle the UI based on whether it was added or removed
             if (data.action === 'added') {
-                btn.innerHTML = '🤍 Remove From Favorites';
-                btn.className = 'favorite-btn btn-remove';
+                btn.innerHTML = '🤍 Remove from Favorites';
+                btn.className = 'btn btn-fav-remove';
             } else if (data.action === 'removed') {
-                btn.innerHTML = '❤️ Add To Favorites';
-                btn.className = 'favorite-btn btn-add';
+                btn.innerHTML = '❤️ Add to Favorites';
+                btn.className = 'btn btn-fav-add';
             }
         } else {
-            // Revert on unexpected error
             btn.innerHTML = originalText;
             alert("Something went wrong!");
         }

@@ -263,3 +263,126 @@ body::after{
     }
 
 }
+
+/* Navbar links flex containment alignment */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+/* Premium Action Buttons */
+.btn-sell {
+    background: #ffffff;
+    color: #002f34 !important;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    border: 2px solid #002f34;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+.btn-sell:hover {
+    background: #002f34;
+    color: white !important;
+}
+
+.btn-register {
+    background: #002f34;
+    color: white !important;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+.btn-register:hover {
+    background: #004a52;
+}
+
+/* Parent anchor for the menu tracking block */
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+    padding: 5px 0;
+}
+
+/* Circular Profile Avatar badge mapping out initials */
+.nav-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #312e81; /* Premium deep blue color accent */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 15px;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* The hidden content menu card container */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 48px;
+    background-color: #ffffff;
+    min-width: 200px;
+    box-shadow: 0px 10px 25px rgba(0,0,0,0.12);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+    border: 1px solid #e5e7eb;
+    padding: 6px 0;
+}
+
+/* Welcome greetings name formatting section */
+.dropdown-user-meta {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Internal menu dynamic anchor rows formatting links */
+.dropdown-content a {
+    color: #002f34 !important;
+    padding: 12px 20px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 !important; /* Resets outer menu layout grid offsets */
+    transition: background 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #f3f4f6;
+}
+
+/* Trigger visibility mechanics over parent hover boundaries */
+.profile-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Bright alerting point counting incoming threads state */
+.dropdown-badge {
+    background: #ff4d4f;
+    color: white;
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    float: right;
+    margin-top: 2px;
+}
+
+/* Restrictive danger action highlight modifier specifically built for logouts */
+.dropdown-link-logout {
+    color: #ff4d4f !important;
+}
+.dropdown-link-logout:hover {
+    background-color: #fff1f0;
+}
