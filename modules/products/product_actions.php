@@ -14,9 +14,11 @@ function postProduct($conn)
 
     $tempName = $_FILES['image']['tmp_name'];
 
-    $uploadPath = __DIR__ . '/../../uploads/products/' . $imageName;
+    $uploadPath = dirname(__DIR__, 2) . '/public/uploads/products/' . $imageName;
 
-    move_uploaded_file($tempName, $uploadPath);
+    if (!move_uploaded_file($tempName, $uploadPath)) {
+        return "Target folder upload failed! Verify your directory path permissions.";
+    }
 
     $sql = "INSERT INTO products
             (user_id, title, description, price, location, category, image)

@@ -13,6 +13,7 @@ global $conn;
 
 $user_id = $_SESSION['user_id'];
 
+
 $sql = "SELECT * FROM products
         WHERE user_id = ?
         ORDER BY id DESC";
@@ -147,7 +148,7 @@ $result = mysqli_stmt_get_result($stmt);
 
             <div class="card">
 
-                <img src="../uploads/products/<?php echo $product['image']; ?>">
+                <img src="/olx/public/uploads/products/<?php echo $product['image']; ?>">
 
                 <div class="card-body">
 
