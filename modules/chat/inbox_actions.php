@@ -6,26 +6,11 @@ if(!isset($_SESSION['user_id'])){
     exit();
 }
 
-// Going up two levels to hit your shared database connection
 require_once __DIR__ . '/../../shared/db.php';
+require_once __DIR__ . '/inbox_functions.php'; 
 
 $current_user = intval($_SESSION['user_id']);
-
-// Heavy Query: Pulls the latest message row from every unique user conversation lane
-$sql = "SELECT m.*, 
-               u.id as partner_id, u.name as partner_name,
-               p.title as product_title
-        FROM messages m
-        INNER JOIN users u ON (u.id = m.sender_id OR u.id = m.receiver_id) AND u.id != $current_user
-        INNER JOIN products p ON p.id = m.product_id
-        WHERE m.id IN (
-            SELECT MAX(id) FROM messages 
-            WHERE sender_id = $current_user OR receiver_id = $current_user 
-            GROUP BY product_id, LEAST(sender_id, receiver_id), GREATEST(sender_id, receiver_id)
-        )
-        ORDER BY m.id DESC";
-
-$result = mysqli_query($conn, $sql);
+$result = getLatestUserChats($conn, $current_user); 
 ?>
 
 <!DOCTYPE html>
@@ -52,6 +37,9 @@ $result = mysqli_query($conn, $sql);
         .last-msg { font-size: 14px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
         .unread-dot { width: 10px; height: 10px; background: #312e81; border-radius: 50%; margin-left: 10px; }
         .empty-state { text-align: center; padding: 40px; color: #64748b; }
+        
+        /* Subtle styling accent for the outgoing message prefix */
+        .my-prefix { color: #94a3b8; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -68,34 +56,90 @@ $result = mysqli_query($conn, $sql);
     <div class="inbox-card">
         <h2>📥 Your Chats</h2>
         
-        <?php if(mysqli_num_rows($result) > 0): ?>
-            <?php while($chat = mysqli_fetch_assoc($result)): ?>
-                <a href="chat.php?product_id=<?php echo $chat['product_id']; ?>&receiver_id=<?php echo $chat['partner_id']; ?>" class="chat-item">
-                    <div style="display: flex; align-items: center; width: 100%;">
-                        <div class="partner-avatar">
-                            <?php echo substr(htmlspecialchars($chat['partner_name']), 0, 1); ?>
-                        </div>
-                        <div class="chat-details">
-                            <div class="chat-meta">
-                                <span class="partner-name"><?php echo htmlspecialchars($chat['partner_name']); ?></span>
-                                <span class="product-tag"><?php echo htmlspecialchars($chat['product_title']); ?></span>
+        <div id="inbox-list-container">
+            <?php if(mysqli_num_rows($result) > 0): ?>
+                <?php while($chat = mysqli_fetch_assoc($result)): ?>
+                    <?php 
+                        // Initial static page-load check
+                        $prefix = ($chat['sender_id'] == $current_user) ? '<span class="my-prefix">You: </span>' : '';
+                    ?>
+                    <a href="chat.php?product_id=<?php echo $chat['product_id']; ?>&receiver_id=<?php echo $chat['partner_id']; ?>" class="chat-item">
+                        <div style="display: flex; align-items: center; width: 100%;">
+                            <div class="partner-avatar">
+                                <?php echo substr(htmlspecialchars($chat['partner_name']), 0, 1); ?>
                             </div>
-                            <p class="last-msg"><?php echo htmlspecialchars($chat['message']); ?></p>
+                            <div class="chat-details">
+                                <div class="chat-meta">
+                                    <span class="partner-name"><?php echo htmlspecialchars($chat['partner_name']); ?></span>
+                                    <span class="product-tag"><?php echo htmlspecialchars($chat['product_title']); ?></span>
+                                </div>
+                                <p class="last-msg"><?php echo $prefix . htmlspecialchars($chat['message']); ?></p>
+                            </div>
+                            <?php if($chat['is_seen'] == 0 && $chat['receiver_id'] == $current_user): ?>
+                                <div class="unread-dot"></div>
+                            <?php endif; ?>
                         </div>
-                        <?php if($chat['is_seen'] == 0 && $chat['receiver_id'] == $current_user): ?>
-                            <div class="unread-dot"></div>
-                        <?php endif; ?>
-                    </div>
-                </a>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <div class="empty-state">
-                <h3>No active chats found</h3>
-                <p style="font-size: 14px; margin-top: 5px;">Conversations with other marketplace users will pull together here.</p>
-            </div>
-        <?php endif; ?>
+                    </a>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div class="empty-state">
+                    <h3>No active chats found</h3>
+                    <p style="font-size: 14px; margin-top: 5px;">Conversations with other marketplace users will pull together here.</p>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
+
+<script>
+    const inboxContainer = document.getElementById('inbox-list-container');
+
+    function pollInboxUpdates() {
+        fetch('../modules/chat/inbox_data.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.chats.length === 0) {
+                        inboxContainer.innerHTML = `
+                            <div class="empty-state">
+                                <h3>No active chats found</h3>
+                                <p style="font-size: 14px; margin-top: 5px;">Conversations with other marketplace users will pull together here.</p>
+                            </div>`;
+                        return;
+                    }
+
+                    let htmlBuilder = '';
+                    data.chats.forEach(chat => {
+                        const initial = chat.partner_name.charAt(0);
+                        const unreadDot = chat.is_unread ? '<div class="unread-dot"></div>' : '';
+                        
+                        // Dynamic background AJAX loop check
+                        const prefix = chat.is_mine ? '<span class="my-prefix">You: </span>' : '';
+
+                        htmlBuilder += `
+                            <a href="chat.php?product_id=${chat.product_id}&receiver_id=${chat.partner_id}" class="chat-item">
+                                <div style="display: flex; align-items: center; width: 100%;">
+                                    <div class="partner-avatar">${initial}</div>
+                                    <div class="chat-details">
+                                        <div class="chat-meta">
+                                            <span class="partner-name">${chat.partner_name}</span>
+                                            <span class="product-tag">${chat.product_title}</span>
+                                        </div>
+                                        <p class="last-msg">${prefix}${chat.message}</p>
+                                    </div>
+                                    ${unreadDot}
+                                </div>
+                            </a>`;
+                    });
+
+                    inboxContainer.innerHTML = htmlBuilder;
+                }
+            })
+            .catch(error => console.error('Error fetching asynchronous inbox snapshots:', error));
+    }
+
+    setInterval(pollInboxUpdates, 3000);
+</script>
 
 </body>
 </html>
