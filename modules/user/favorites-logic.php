@@ -117,7 +117,7 @@ $result = mysqli_stmt_get_result($stmt);
 
             <a class="card" href="product.php?id=<?php echo $product['id']; ?>">
 
-                <img src="../uploads/products/<?php echo $product['image']; ?>">
+                <img src="uploads/products/<?php echo $product['image']; ?>" alt="Product Image">
 
                 <div class="card-body">
 
