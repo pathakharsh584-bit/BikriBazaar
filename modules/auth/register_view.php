@@ -10,6 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_once __DIR__ . '/auth_actions.php';
     $message = registerUser($conn);
 }
+$hide_register = true;
 ?>
 
 <!DOCTYPE html>
@@ -98,7 +99,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .nav-links a:hover::after {
             width: 100%;
         }
-        .nav-links a:not(.btn-login) {
+        /* Styles for normal links (Home, Login) */
+        .nav-links a:not(.btn-login):not(.btn-register) {
             font-size: 0.9rem;
             font-weight: 500;
             color: var(--text);
@@ -109,9 +111,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             align-items: center;
             gap: 4px;
         }
-        .nav-links a:not(.btn-login):hover {
+        .nav-links a:not(.btn-login):not(.btn-register):hover {
             background: var(--surface);
         }
+        /* Login button (same gradient as Register) */
         .btn-login {
             background: var(--grad);
             color: #fff !important;
@@ -124,6 +127,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             transition: opacity 0.2s;
         }
         .btn-login:hover {
+            opacity: 0.9;
+        }
+        /* Register button (identical to Login) – added for consistency */
+        .btn-register {
+            background: var(--grad);
+            color: #fff !important;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 0.45rem 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: opacity 0.2s;
+        }
+        .btn-register:hover {
             opacity: 0.9;
         }
 
@@ -353,24 +371,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-    <div class="logo">
-        <img src="assets/images/logo.png" alt="BikriBazaar Logo" class="logo-img"
-             onerror="this.style.display='none'">
-        Bikri<span>Bazaar</span>
-    </div>
-    <div class="nav-links">
-        <a href="index.php"><i class="fa-solid fa-house"></i> Home</a>
-        <?php if(isset($_SESSION['user_id'])): ?>
-            <a href="logout.php">Logout</a>
-        <?php else: ?>
-            <a href="login.php" class="btn-login">
-                <i class="fa-solid fa-right-to-bracket"></i> Login
-            </a>
-        <?php endif; ?>
-    </div>
-</div>
+<!-- ==================== SHARED NAVBAR ==================== -->
+<?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
+<!-- ======================================================= -->
 
 <!-- MAIN SPLIT LAYOUT -->
 <div class="auth-container">

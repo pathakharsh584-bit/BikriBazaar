@@ -358,26 +358,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-    <div class="logo">
-        <img src="assets/images/logo.png" alt="BikriBazaar Logo" class="logo-img"
-             onerror="this.style.display='none'">
-        Bikri<span>Bazaar</span>
-    </div>
-    <div class="nav-links">
-        <!-- Home link (bold) -->
-       <a href="index.php"><i class="fa-solid fa-house"></i> Home</a>
-        <?php if(isset($_SESSION['user_id'])): ?>
-            <a href="logout.php">Logout</a>
-        <?php else: ?>
-            <!-- Login link removed – only Register remains -->
-            <a href="register.php" class="btn-register">
-                <i class="fa-solid fa-user-plus"></i> Register
-            </a>
-        <?php endif; ?>
-    </div>
-</div>
+<!-- ==================== SHARED NAVBAR (correct path for modules/auth/) ==================== -->
+<?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
+<!-- ================================================================================ -->
 
 <!-- MAIN -->
 <div class="auth-container">
@@ -450,7 +433,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <button type="button" class="toggle-pwd"
                                 onclick="togglePwd(this)"
                                 title="Show / hide password">
-                            
+                            <i class="fa-regular fa-eye"></i>
                         </button>
                     </div>
                 </div>
