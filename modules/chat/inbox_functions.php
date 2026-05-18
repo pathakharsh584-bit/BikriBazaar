@@ -14,9 +14,10 @@ function getLatestUserChats($conn, $current_user) {
             INNER JOIN users u ON (u.id = m.sender_id OR u.id = m.receiver_id) AND u.id != $current_user
             INNER JOIN products p ON p.id = m.product_id
             WHERE m.id IN (
-                SELECT MAX(id) FROM messages 
-                WHERE sender_id = $current_user OR receiver_id = $current_user 
-                GROUP BY product_id, LEAST(sender_id, receiver_id), GREATEST(sender_id, receiver_id)
+                SELECT MAX(sub_m.id) 
+                FROM messages sub_m
+                WHERE sub_m.sender_id = $current_user OR sub_m.receiver_id = $current_user 
+                GROUP BY sub_m.product_id, LEAST(sub_m.sender_id, sub_m.receiver_id), GREATEST(sub_m.sender_id, sub_m.receiver_id)
             )
             ORDER BY m.id DESC";
 
