@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 if(!isset($_SESSION['user_id'])){
@@ -13,7 +12,7 @@ global $conn;
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch unread count for navbar 
+// Fetch unread count for navbar (optional)
 $unread_count = 0;
 $unread_sql = "SELECT COUNT(*) as total FROM messages WHERE receiver_id = ? AND is_seen = 0";
 $unread_stmt = mysqli_prepare($conn, $unread_sql);
@@ -38,7 +37,6 @@ mysqli_stmt_bind_param($stmt, 'i', $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $total_favorites = mysqli_num_rows($result);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,7 +69,7 @@ $total_favorites = mysqli_num_rows($result);
 
         a { text-decoration: none; color: inherit; }
 
-       
+        /* NAVBAR */
         .navbar {
             background: #fff;
             box-shadow: 0 1px 6px rgba(0,0,0,0.08);
@@ -235,7 +233,7 @@ $total_favorites = mysqli_num_rows($result);
             color: #ef4444 !important;
         }
 
-        /* PAGE CONTENT*/
+        /* PAGE CONTENT */
         .container {
             max-width: 1100px;
             margin: 2rem auto;
@@ -394,27 +392,6 @@ $total_favorites = mysqli_num_rows($result);
                 <div class="dropdown-content">
                     <div class="dropdown-user-meta">
                         <strong>Hi, <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></strong>
-    <a href="index.php">← Back To Home</a>
-</div>
-
-<div class="container">
-
-    <div class="products">
-
-        <?php while($product = mysqli_fetch_assoc($result)) { ?>
-
-            <a class="card" href="product.php?id=<?php echo $product['id']; ?>">
-
-                <img src="uploads/products/<?php echo $product['image']; ?>" alt="Product Image">
-
-                <div class="card-body">
-
-                    <div class="price">
-                        ₹ <?php echo $product['price']; ?>
-                    </div>
-
-                    <div class="title">
-                        <?php echo $product['title']; ?>
                     </div>
                     <hr>
                     <a href="my-ads.php"><i class="fa-solid fa-list"></i> My Ads</a>
@@ -449,8 +426,8 @@ $total_favorites = mysqli_num_rows($result);
         <div class="products-grid">
             <?php while($product = mysqli_fetch_assoc($result)): ?>
                 <a class="product-card" href="product.php?id=<?php echo $product['id']; ?>">
-                    <img class="product-image" 
-                         src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>" 
+                    <img class="product-image"
+                         src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
                          alt="<?php echo htmlspecialchars($product['title']); ?>">
                     <div class="product-content">
                         <div class="price">₹ <?php echo number_format($product['price']); ?></div>
