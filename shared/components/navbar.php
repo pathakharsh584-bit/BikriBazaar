@@ -1,5 +1,5 @@
 <?php
-// shared/components/navbar.php
+
 ?>
 <div class="navbar">
     <div class="logo">
@@ -41,7 +41,7 @@
         <?php else: ?>
             <a href="login.php"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
             <?php 
-            // Hide Register link if $hide_register is true
+           
             if (!isset($hide_register) || $hide_register !== true):
             ?>
                 <a href="register.php" class="btn-register">

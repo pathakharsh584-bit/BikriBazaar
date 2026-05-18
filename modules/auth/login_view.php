@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         a { text-decoration: none; color: inherit; }
 
-        /* ── NAVBAR (animated underline for ALL links) ── */
+
         .navbar {
             background: #fff;
             box-shadow: 0 2px 12px rgba(26,63,196,0.10);
@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             gap: 0.8rem;
             margin-left: auto;
         }
-        /* All navbar links need position relative for the underline */
+      
         .nav-links a {
             position: relative;
         }
@@ -128,14 +128,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             opacity: 0.9;
         }
 
-        /* ── LAYOUT (unchanged) ── */
         .auth-container {
             display: flex;
             flex: 1;
             min-height: calc(100vh - 66px);
         }
 
-        /* ── LEFT PANEL ── */
         .left-panel {
             flex: 1;
             background: var(--grad);
@@ -206,7 +204,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 20px; text-align: center;
         }
 
-        /* ── RIGHT PANEL ── */
+     
         .auth-wrapper {
             flex: 1;
             display: flex;
@@ -235,7 +233,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 0.92rem; color: var(--muted);
         }
 
-        /* INPUT GROUPS */
         .form-group {
             margin-bottom: 1.1rem;
             position: relative;
@@ -289,7 +286,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .forgot-row a:hover { text-decoration: underline; }
 
-        /* SUBMIT BUTTON */
+     
         .auth-btn {
             width: 100%;
             padding: 14px;
@@ -306,7 +303,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .auth-btn:hover { opacity: 0.92; transform: translateY(-2px); }
 
-        /* DIVIDER */
+      
         .divider {
             display: flex; align-items: center;
             gap: 0.75rem; margin: 1.4rem 0;
@@ -317,7 +314,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             height: 1px; background: var(--border);
         }
 
-        /* REGISTER LINK */
+       
         .register-link {
             text-align: center;
             font-size: 0.88rem; color: var(--muted);
@@ -327,7 +324,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .register-link a:hover { text-decoration: underline; }
 
-        /* MESSAGE */
+     
         .message {
             display: flex; align-items: center; gap: 0.6rem;
             background: #fee2e2; color: #b91c1c;
@@ -337,7 +334,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .message i { flex-shrink: 0; }
 
-        /* SUCCESS message variant */
+      
         .message.success {
             background: #d1fae5; color: #065f46;
             border-color: #a7f3d0;
@@ -358,9 +355,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
 
-<!-- ==================== SHARED NAVBAR (correct path for modules/auth/) ==================== -->
+
 <?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
-<!-- ================================================================================ -->
+
 
 <!-- MAIN -->
 <div class="auth-container">
@@ -389,10 +386,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <i class="fa-solid fa-heart"></i>
                     Save your favourite listings
                 </div>
-                <div class="feature-item">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    Safe &amp; trusted transactions
-                </div>
+                
             </div>
         </div>
     </div>
@@ -433,7 +427,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <button type="button" class="toggle-pwd"
                                 onclick="togglePwd(this)"
                                 title="Show / hide password">
-                            <i class="fa-regular fa-eye"></i>
+                          
                         </button>
                     </div>
                 </div>

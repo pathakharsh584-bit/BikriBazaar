@@ -133,17 +133,55 @@ if (isset($_SESSION['user_id'])) {
         }
         .btn-register:hover { opacity: 0.9; }
 
-        /* PROFILE DROPDOWN */
-        .profile-dropdown { position: relative; }
-        .nav-avatar {
-            width: 38px; height: 38px; border-radius: 50%;
-            background: var(--grad); color: #fff;
-            font-weight: 800; font-size: 1rem;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; border: 2px solid var(--border);
-            transition: border-color 0.2s;
-        }
-        .nav-avatar:hover { border-color: var(--teal); }
+        
+.profile-dropdown {
+    position: relative;
+}
+.nav-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a3fc4, #0ea5a0);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid #dde4f5;
+    transition: opacity 0.2s;
+}
+.nav-avatar:hover {
+    opacity: 0.9;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: -4px;        
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+    min-width: 200px;
+    border: 1px solid #dde4f5;
+    overflow: hidden;
+    z-index: 200;
+}
+.profile-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.profile-dropdown::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background: transparent;
+}
         .dropdown-content {
             display: none; position: absolute; right: 0;
             top: calc(100% + 10px); background: #fff;
@@ -167,7 +205,7 @@ if (isset($_SESSION['user_id'])) {
             padding: 0.12rem 0.42rem; border-radius: 20px; margin-left: auto;
         }
 
-        /* HERO */
+     
         .hero-banner {
             background: var(--grad);
             padding: 3.2rem 1.5rem 2.8rem;
@@ -189,7 +227,7 @@ if (isset($_SESSION['user_id'])) {
             color: rgba(255,255,255,0.80); position: relative;
         }
 
-        /* SEARCH */
+     
         .search-box {
             max-width: 780px; margin: 0 auto;
             padding: 0 1rem; position: relative; top: -22px;
@@ -442,17 +480,15 @@ if (isset($_SESSION['user_id'])) {
 
 <body>
 
-<!-- ==================== SHARED NAVBAR (correct path) ==================== -->
+<!--used shared NAVBAR -->
 <?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
-<!-- ====================================================================== -->
 
-<!-- HERO -->
+
 <div class="hero-banner">
     <h1>Discover Great Deals Near You</h1>
     <p>Find Cars, Mobile Phones, Properties &amp; more near you</p>
 </div>
 
-<!-- SEARCH -->
 <div class="search-box">
     <form class="search-form" method="GET">
         <input type="text" name="search" placeholder="Search products, gadgets, cars..."
@@ -473,7 +509,7 @@ if (isset($_SESSION['user_id'])) {
 
 <div class="container">
 
-    <!-- CATEGORIES -->
+
     <h2 class="section-title">All Categories</h2>
     <div class="categories-grid">
         <a href="?category=Cars"        class="category-card"><i class="fa-solid fa-car"></i>Cars</a>
@@ -489,7 +525,7 @@ if (isset($_SESSION['user_id'])) {
         <a href="?category=Others"      class="category-card"><i class="fa-solid fa-box"></i>Others</a>
     </div>
 
-    <!-- SAFETY TIP -->
+   
     <div class="tips-strip">
         <i class="fa-solid fa-shield-halved"></i>
         <span><strong>Stay safe:</strong> Never share OTP or pay in advance. Meet sellers in public places.</span>
