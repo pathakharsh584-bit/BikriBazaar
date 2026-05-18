@@ -13,7 +13,7 @@ global $conn;
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch unread count for navbar (optional)
+// Fetch unread count for navbar 
 $unread_count = 0;
 $unread_sql = "SELECT COUNT(*) as total FROM messages WHERE receiver_id = ? AND is_seen = 0";
 $unread_stmt = mysqli_prepare($conn, $unread_sql);
@@ -394,6 +394,27 @@ $total_favorites = mysqli_num_rows($result);
                 <div class="dropdown-content">
                     <div class="dropdown-user-meta">
                         <strong>Hi, <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></strong>
+    <a href="index.php">← Back To Home</a>
+</div>
+
+<div class="container">
+
+    <div class="products">
+
+        <?php while($product = mysqli_fetch_assoc($result)) { ?>
+
+            <a class="card" href="product.php?id=<?php echo $product['id']; ?>">
+
+                <img src="uploads/products/<?php echo $product['image']; ?>" alt="Product Image">
+
+                <div class="card-body">
+
+                    <div class="price">
+                        ₹ <?php echo $product['price']; ?>
+                    </div>
+
+                    <div class="title">
+                        <?php echo $product['title']; ?>
                     </div>
                     <hr>
                     <a href="my-ads.php"><i class="fa-solid fa-list"></i> My Ads</a>
