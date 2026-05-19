@@ -13,6 +13,7 @@ global $conn;
 
 $user_id = $_SESSION['user_id'];
 
+
 $unread_count = 0;
 $unread_sql = "SELECT COUNT(*) as total FROM messages WHERE receiver_id = ? AND is_seen = 0";
 $unread_stmt = mysqli_prepare($conn, $unread_sql);
@@ -25,12 +26,32 @@ if($unread_res){
 }
 mysqli_stmt_close($unread_stmt);
 
-$sql = "SELECT * FROM products WHERE user_id = ? ORDER BY id DESC";
+//Fetch all products and tally their statuses
+$sql = "SELECT products.*, 
+        (SELECT image_path FROM product_images WHERE product_id = products.id ORDER BY id ASC LIMIT 1) as image 
+        FROM products 
+        WHERE user_id = ? 
+        ORDER BY id DESC";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, 'i', $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$total_ads = mysqli_num_rows($result);
+
+$products = [];
+$active_count = 0;
+$sold_count = 0;
+
+while($row = mysqli_fetch_assoc($result)) {
+    $products[] = $row;
+   
+    $status = isset($row['status']) ? $row['status'] : 'active'; 
+    if($status == 'active') {
+        $active_count++;
+    } else {
+        $sold_count++;
+    }
+}
+$total_ads = count($products);
 
 ?>
 <!DOCTYPE html>
@@ -98,7 +119,7 @@ $total_ads = mysqli_num_rows($result);
             gap: 0.5rem;
             margin-left: auto;
         }
-       
+        
         .nav-links a {
             font-size: 0.88rem;
             font-weight: bold;
@@ -288,6 +309,7 @@ $total_ads = mysqli_num_rows($result);
             gap: 0.8rem;
             margin-bottom: 1.5rem;
             flex-wrap: wrap;
+            padding: 0 1rem;
         }
         .stat-pill {
             background: #fff;
@@ -308,6 +330,7 @@ $total_ads = mysqli_num_rows($result);
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 1.1rem;
+            padding: 0 1rem 1rem;
         }
 
         .ad-card {
@@ -318,6 +341,11 @@ $total_ads = mysqli_num_rows($result);
             transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+        .ad-card.sold-card {
+            opacity: 0.8;
+            background: #f8fafc;
         }
         .ad-card:hover {
             transform: translateY(-3px);
@@ -352,6 +380,27 @@ $total_ads = mysqli_num_rows($result);
             letter-spacing: 0.3px;
         }
 
+        .sold-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .sold-stamp {
+            background: #dc2626;
+            color: #fff;
+            font-weight: 900;
+            padding: 0.5rem 1.5rem;
+            transform: rotate(-15deg);
+            border: 2px solid #fff;
+            border-radius: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
         .ad-body {
             padding: 0.9rem 1rem 0;
             flex: 1;
@@ -383,13 +432,13 @@ $total_ads = mysqli_num_rows($result);
         }
         .ad-meta i { font-size: 0.68rem; color: var(--teal); }
 
-       
+        
         .ad-actions {
             display: flex;
             gap: 0.5rem;
             padding: 0.75rem 1rem 0.9rem;
         }
-        .btn-edit, .btn-delete {
+        .btn-edit, .btn-delete, .btn-sold, .btn-sold-static {
             flex: 1;
             text-align: center;
             padding: 0.48rem 0;
@@ -410,12 +459,30 @@ $total_ads = mysqli_num_rows($result);
             border: 1.5px solid #c7d2fe;
         }
         .btn-edit:hover { background: #e0e7ff; transform: translateY(-1px); }
+        
         .btn-delete {
             background: #fff0f0;
             color: #b91c1c;
             border: 1.5px solid #fecaca;
         }
         .btn-delete:hover { background: #fee2e2; transform: translateY(-1px); }
+
+        /* NEW: Button stylings for marking as sold */
+        .btn-sold {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1.5px solid #a7f3d0;
+            width: 100%;
+        }
+        .btn-sold:hover { background: #d1fae5; transform: translateY(-1px); }
+
+        .btn-sold-static {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1.5px solid #d1d5db;
+            cursor: not-allowed;
+            flex: 2; /* takes up more space since edit is gone */
+        }
 
         .empty-state {
             text-align: center;
@@ -461,6 +528,7 @@ $total_ads = mysqli_num_rows($result);
         @media (max-width: 640px) {
             .navbar { padding: 0 1rem; }
             .ads-grid { grid-template-columns: repeat(2, 1fr); }
+            .empty-state { width: 100%; left: 0; border: none; }
         }
         @media (max-width: 420px) {
             .ads-grid { grid-template-columns: 1fr; }
@@ -516,7 +584,6 @@ $total_ads = mysqli_num_rows($result);
 
 
 <div class="page">
-    <!-- check changes-->
     <div class="top-bar">
         <div class="top-bar-left">
             <h1><i class="fa-solid fa-list-check"></i> My Ads</h1>
@@ -534,22 +601,34 @@ $total_ads = mysqli_num_rows($result);
             <i class="fa-solid fa-layer-group"></i>
             <span>Total Ads: <strong><?php echo $total_ads; ?></strong></span>
         </div>
-        <div class="stat-pill">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>Status: <strong style="color:#059669;">Active</strong></span>
+        <div class="stat-pill" style="border-color: #a7f3d0; background: #ecfdf5;">
+            <i class="fa-solid fa-circle-check" style="color: #059669;"></i>
+            <span style="color: #065f46;">Active: <strong><?php echo $active_count; ?></strong></span>
+        </div>
+        <div class="stat-pill" style="border-color: #fecaca; background: #fef2f2;">
+            <i class="fa-solid fa-tag" style="color: #dc2626;"></i>
+            <span style="color: #991b1b;">Sold: <strong><?php echo $sold_count; ?></strong></span>
         </div>
     </div>
 
     <?php if($total_ads > 0): ?>
         <div class="ads-grid">
-            <?php while($product = mysqli_fetch_assoc($result)): ?>
-                <div class="ad-card">
+            <?php foreach($products as $product): ?>
+                <?php $is_sold = (isset($product['status']) && $product['status'] === 'sold'); ?>
+                
+                <div class="ad-card <?php echo $is_sold ? 'sold-card' : ''; ?>">
                     <div class="ad-img-wrap">
                         <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
                              alt="<?php echo htmlspecialchars($product['title']); ?>"
                              loading="lazy">
                         <?php if(!empty($product['category'])): ?>
                             <span class="ad-category"><?php echo htmlspecialchars($product['category']); ?></span>
+                        <?php endif; ?>
+                        
+                        <?php if($is_sold): ?>
+                            <div class="sold-overlay">
+                                <div class="sold-stamp">SOLD</div>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -563,17 +642,30 @@ $total_ads = mysqli_num_rows($result);
                     </div>
 
                     <div class="ad-actions">
-                        <a href="edit-product.php?id=<?php echo $product['id']; ?>" class="btn-edit">
-                            <i class="fa-solid fa-pen"></i> Edit
-                        </a>
+                        <?php if(!$is_sold): ?>
+                            <form method="POST" action="../modules/products/mark_sold.php" style="flex: 1;">
+                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                <button type="submit" class="btn-sold" onclick="return confirm('Mark this item as sold? It will be hidden from search results.');">
+                                    <i class="fa-solid fa-check"></i> Sold
+                                </button>
+                            </form>
+                            <a href="edit-product.php?id=<?php echo $product['id']; ?>" class="btn-edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                        <?php else: ?>
+                            <span class="btn-sold-static">
+                                <i class="fa-solid fa-tag"></i> Item Sold
+                            </span>
+                        <?php endif; ?>
+                        
                         <a href="../modules/products/delete_product.php?id=<?php echo $product['id']; ?>"
-                           class="btn-delete"
+                           class="btn-delete" style="flex: 0.5;"
                            onclick="return confirm('Delete this ad? This cannot be undone.');">
-                            <i class="fa-solid fa-trash"></i> Delete
+                            <i class="fa-solid fa-trash"></i>
                         </a>
                     </div>
                 </div>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         </div>
     <?php else: ?>
         <div class="empty-state">
