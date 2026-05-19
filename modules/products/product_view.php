@@ -1,8 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../shared/db.php';
-// Assuming BASE_URL is defined in a config file, if not, define it here for the chat link
-// define('BASE_URL', '/BikriBazaar/public/');
+
 
 if(!isset($_GET['id'])){
     die("Product Not Found");
@@ -10,7 +9,7 @@ if(!isset($_GET['id'])){
 
 $product_id = intval($_GET['id']);
 
-// UPDATED QUERY: We use a LEFT JOIN to grab the seller's name and join date from the users table
+// 1. Fetch Product and Seller Details
 $sql = "SELECT p.*, u.name as seller_name, u.created_at as seller_join_date 
         FROM products p 
         LEFT JOIN users u ON p.user_id = u.id 
@@ -23,7 +22,20 @@ if(mysqli_num_rows($result) == 0){
 
 $product = mysqli_fetch_assoc($result);
 
-// Check if favorited
+// Fetch All Images for this Product
+$img_sql = "SELECT image_path FROM product_images WHERE product_id = $product_id ORDER BY id ASC";
+$img_result = mysqli_query($conn, $img_sql);
+
+$images = [];
+if ($img_result && mysqli_num_rows($img_result) > 0) {
+    while($row = mysqli_fetch_assoc($img_result)) {
+        $images[] = $row['image_path'];
+    }
+} else {
+    $images[] = 'default-placeholder.png'; 
+}
+
+// 3. Check if favorited
 $is_favorited = false;
 if(isset($_SESSION['user_id'])){
     $user_id = intval($_SESSION['user_id']);
@@ -64,8 +76,50 @@ if(isset($_SESSION['user_id'])){
         /* --- LEFT COLUMN: Product Content --- */
         .main-content { display: flex; flex-direction: column; gap: 20px; }
         
-        .image-card { background: black; border-radius: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 500px; }
-        .image-card img { width: 100%; height: 100%; object-fit: contain; }
+        /* NEW: Interactive Image Gallery Styles */
+        .gallery-container {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .main-image-wrap { 
+            background: black; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 450px; 
+            margin-bottom: 10px;
+        }
+        .main-image-wrap img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            transition: opacity 0.2s ease-in-out;
+        }
+        .thumbnails-wrap {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px; /* Space for scrollbar if many images */
+        }
+        .thumb-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+        .thumb-img:hover { opacity: 0.9; }
+        .thumb-img.active {
+            border-color: #0ea5a0;
+            opacity: 1;
+        }
 
         .details-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .details-card h3 { font-size: 24px; margin-bottom: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
@@ -103,7 +157,7 @@ if(isset($_SESSION['user_id'])){
         /* Mobile Responsiveness */
         @media (max-width: 850px) {
             .layout-container { grid-template-columns: 1fr; }
-            .image-card { height: 350px; }
+            .main-image-wrap { height: 350px; }
         }
     </style>
 </head>
@@ -120,8 +174,22 @@ if(isset($_SESSION['user_id'])){
 <div class="layout-container">
 
     <div class="main-content">
-        <div class="image-card">
-            <img src="/olx/public/uploads/products/<?php echo $product['image']; ?>" alt="Product Image">
+        
+        <div class="gallery-container">
+            <div class="main-image-wrap">
+                <img id="mainImage" src="/olx/public/uploads/products/<?php echo htmlspecialchars($images[0]); ?>" alt="Product Image">
+            </div>
+            
+            <?php if(count($images) > 1): ?>
+                <div class="thumbnails-wrap">
+                    <?php foreach($images as $index => $img): ?>
+                        <img src="/olx/public/uploads/products/<?php echo htmlspecialchars($img); ?>" 
+                             class="thumb-img <?php echo ($index == 0) ? 'active' : ''; ?>" 
+                             onclick="changeMainImage(this, '/olx/public/uploads/products/<?php echo htmlspecialchars($img); ?>')"
+                             alt="Thumbnail">
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="details-card">
@@ -133,6 +201,9 @@ if(isset($_SESSION['user_id'])){
             <div class="metadata">
                 <div>📂 Category: <strong><?php echo htmlspecialchars($product['category']); ?></strong></div>
                 <div>🆔 Ad ID: <strong><?php echo $product['id']; ?></strong></div>
+                <?php if(isset($product['condition'])): ?>
+                    <div>✨ Condition: <strong><?php echo ucfirst(htmlspecialchars($product['condition'])); ?></strong></div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -170,6 +241,8 @@ if(isset($_SESSION['user_id'])){
             <?php elseif ($_SESSION['user_id'] == $product['user_id']): ?>
                 <a href="edit-product.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">✏️ Edit Your Ad</a>
             
+            <?php elseif (isset($product['status']) && $product['status'] === 'sold'): ?>
+                 <button class="btn" style="background:#f3f4f6; color:#9ca3af; border:2px solid #d1d5db; cursor:not-allowed;" disabled>🚫 Item Sold</button>
             <?php else: ?>
                 <a href="<?php echo BASE_URL; ?>chat.php?product_id=<?php echo $product['id']; ?>&receiver_id=<?php echo $product['user_id']; ?>" class="btn btn-chat">
                     💬 Chat with Seller
@@ -182,6 +255,20 @@ if(isset($_SESSION['user_id'])){
 </div>
 
 <script>
+
+function changeMainImage(thumbnailElement, newImageSrc) {
+    // 1. Update the main image source
+    document.getElementById('mainImage').src = newImageSrc;
+    
+    // 2. Remove 'active' class from all thumbnails
+    const thumbnails = document.querySelectorAll('.thumb-img');
+    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+    
+    // 3. Add 'active' class to the clicked thumbnail
+    thumbnailElement.classList.add('active');
+}
+
+
 function toggleFavorite(productId) {
     const btn = document.getElementById('favBtn');
     const originalText = btn.innerHTML;

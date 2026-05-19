@@ -12,7 +12,7 @@ global $conn;
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch unread count for navbar (optional)
+
 $unread_count = 0;
 $unread_sql = "SELECT COUNT(*) as total FROM messages WHERE receiver_id = ? AND is_seen = 0";
 $unread_stmt = mysqli_prepare($conn, $unread_sql);
@@ -25,10 +25,10 @@ if($unread_res){
 }
 mysqli_stmt_close($unread_stmt);
 
-$sql = "SELECT products.*
+$sql = "SELECT products.*, 
+        (SELECT image_path FROM product_images WHERE product_id = products.id ORDER BY id ASC LIMIT 1) as image
         FROM favorites
-        INNER JOIN products
-        ON favorites.product_id = products.id
+        INNER JOIN products ON favorites.product_id = products.id
         WHERE favorites.user_id = ?
         ORDER BY favorites.id DESC";
 
