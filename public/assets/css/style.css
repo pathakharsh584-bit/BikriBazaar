@@ -1,4 +1,65 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+/* ==========================================
+   THEME PALETTE SYSTEM (Light Mode by default)
+   ========================================== */
+:root {
+    --bg-body: #eef2ff;
+    --bg-card: rgba(255, 255, 255, 0.75);
+    --bg-navbar: rgba(255, 255, 255, 0.7);
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --shadow-intensity: rgba(0, 0, 0, 0.08);
+}
+
+/* Dark Theme Colors Override */
+[data-theme="dark"] {
+    --bg-body: #0b0f19;
+    --bg-card: rgba(22, 28, 45, 0.8);
+    --bg-navbar: rgba(15, 23, 42, 0.8);
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --border-color: #1e293b;
+    --shadow-intensity: rgba(0, 0, 0, 0.4);
+}
+
+/* Connect the styling parameters to the variables */
+body {
+    background: var(--bg-body) !important;
+    color: var(--text-main) !important;
+}
+.navbar {
+    background: var(--bg-navbar) !important;
+    box-shadow: 0 8px 30px var(--shadow-intensity) !important;
+    border: 1px solid var(--border-color);
+}
+.product-card {
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 12px 30px var(--shadow-intensity) !important;
+}
+.nav-links a {
+    color: var(--text-main) !important;
+}
+
+/* Clean styling for the theme switch toggle button */
+.theme-toggle-btn {
+    background: none;
+    border: 2px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+.theme-toggle-btn:hover {
+    background: var(--border-color);
+    transform: scale(1.05);
+}
 
 *{
     margin:0;
@@ -385,4 +446,33 @@ body::after{
 }
 .dropdown-link-logout:hover {
     background-color: #fff1f0;
+}
+
+/* ==========================================
+   DARK MODE SPECIFIC OVERRIDES
+   ========================================== */
+/* 1. Fix City Tags / Location Badges text visibility */
+.browse-city-section a,
+.city-tags-container a,
+div[class*="city"] a,
+.container a span,
+.location {
+    color: #111827 !important;
+    font-weight: 600 !important;
+}
+
+/* 2. Global Text Overrides when data-theme="dark" is active */
+[data-theme="dark"] h1, 
+[data-theme="dark"] h2, 
+[data-theme="dark"] h3, 
+[data-theme="dark"] h4,
+[data-theme="dark"] label,
+[data-theme="dark"] .form-group label {
+    color: #f3f4f6 !important;
+}
+
+[data-theme="dark"] p, 
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .dropdown-user-meta {
+    color: #9ca3af !important;
 }

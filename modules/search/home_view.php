@@ -660,5 +660,7 @@ if (isset($_SESSION['user_id'])) {
     });
 </script>
 
+<script src="assets/js/theme.js"></script>
+
 </body>
 </html>
