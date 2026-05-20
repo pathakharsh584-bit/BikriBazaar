@@ -2,13 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BikriBazaar Chat</title>
+    <title>Chat with <?php echo htmlspecialchars($receiver_name); ?></title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
     <style>
-        /* Essential Chat UI Constraints */
         body { background: #f3f4f6; font-family: sans-serif; display: flex; justify-content: center; padding-top: 5vh; }
         .chat-container { width: 100%; max-width: 900px; height: 85vh; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
-        .chat-header { background: #312e81; padding: 20px 30px; color: white; font-size: 20px; font-weight: bold; }
+        
+        
+        .chat-header { 
+            background: #312e81; 
+            padding: 15px 30px; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+        }
+        .initial-avatar {
+            width: 40px;
+            height: 40px;
+            background: #f59e0b; 
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .chat-title { font-size: 18px; font-weight: bold; }
+
         .messages-box { flex: 1; padding: 30px; background: #f8fafc; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         .message-wrapper { max-width: 75%; display: flex; flex-direction: column; }
         .my-wrapper { align-self: flex-end; align-items: flex-end; }
@@ -25,10 +48,14 @@
 <body>
 
 <div class="chat-container">
-    <div class="chat-header">💬 Live Chat</div>
-
-    <div class="messages-box" id="messages-box">
+    <div class="chat-header">
+        <div class="initial-avatar">
+            <?php echo strtoupper(substr(htmlspecialchars($receiver_name), 0, 1)); ?>
         </div>
+        <span class="chat-title"><?php echo htmlspecialchars($receiver_name); ?></span>
+    </div>
+
+    <div class="messages-box" id="messages-box"></div>
 
     <form class="send-area" id="chat-form">
         <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off" required>
@@ -37,7 +64,6 @@
 </div>
 
 <script>
-    // Variables passed seamlessly from chat.php
     const productId = <?php echo json_encode($product_id); ?>;
     const receiverId = <?php echo json_encode($receiver_id); ?>;
     const apiUrl = '../modules/chat/chat_actions.php';
@@ -46,7 +72,6 @@
     const form = document.getElementById('chat-form');
     const messageInput = document.getElementById('message-input');
 
-    // 1. Fetch data from API
     function fetchMessages() {
         fetch(`${apiUrl}?action=fetch&product_id=${productId}&other_user_id=${receiverId}`)
             .then(response => response.text())
@@ -58,10 +83,8 @@
             });
     }
 
-    // 2. Post data to API
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        
         const message = messageInput.value.trim();
         if(message === '') return;
 
@@ -71,16 +94,12 @@
         formData.append('receiver_id', receiverId);
         formData.append('message', message);
 
-        fetch(apiUrl, {
-            method: 'POST',
-            body: formData
-        }).then(() => {
+        fetch(apiUrl, { method: 'POST', body: formData }).then(() => {
             messageInput.value = ''; 
             fetchMessages(); 
         });
     });
 
-    // 3. Keep chat live
     setInterval(fetchMessages, 2000);
     fetchMessages();
 </script>

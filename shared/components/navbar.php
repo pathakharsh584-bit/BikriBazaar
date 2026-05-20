@@ -1,6 +1,43 @@
 <?php
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../db.php'; 
 
+$nav_profile_image = null;
+
+if (isset($_SESSION['user_id'])) {
+    global $conn; 
+    
+    if (isset($conn) && $conn) {
+        $nav_user_id = (int)$_SESSION['user_id'];
+        $nav_query = "SELECT profile_image FROM users WHERE id = $nav_user_id LIMIT 1";
+        $nav_result = mysqli_query($conn, $nav_query);
+        
+        if ($nav_result && $nav_row = mysqli_fetch_assoc($nav_result)) {
+            $nav_profile_image = $nav_row['profile_image'];
+        }
+    }
+}
 ?>
+
+<style>
+.nav-profile-img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.nav-avatar{
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+
 <div class="navbar">
     <div class="logo">
         <img src="assets/images/logo.png" alt="BikriBazaar Logo" class="logo-img"
@@ -17,13 +54,24 @@
             </a>
             <div class="profile-dropdown">
                 <div class="nav-avatar">
-                    <?php echo isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U'; ?>
-                </div>
+                    <?php if (!empty($nav_profile_image)): ?>
+                    <img 
+                    src="<?php echo BASE_URL . 'uploads/profiles/' . htmlspecialchars($nav_profile_image); ?>" 
+                    alt="Profile"
+                    class="nav-profile-img"
+                    >
+                <?php else: ?>
+                <?php echo isset($_SESSION['user_name']) 
+                ? strtoupper(substr($_SESSION['user_name'], 0, 1)) 
+                : 'U'; ?>
+                <?php endif; ?>
+                 </div>
                 <div class="dropdown-content">
                     <div class="dropdown-user-meta">
                         <strong>Hi, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User'; ?></strong>
                     </div>
                     <hr>
+                    <a href="profile.php"><i class="fa-solid fa-user-circle"></i> Edit Profile</a>
                     <a href="my-ads.php"><i class="fa-solid fa-list"></i> My Ads</a>
                     <a href="favorites.php"><i class="fa-solid fa-heart"></i> Favorites</a>
                     <a href="inbox.php">
