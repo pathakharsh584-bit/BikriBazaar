@@ -154,28 +154,17 @@ $recentProducts = mysqli_query(
 // ======================================
 
 $favoriteProducts = mysqli_query(
-
     $conn,
-
     "SELECT 
         products.id,
         products.title,
-        products.image,
         users.name AS seller_name,
         COUNT(favorites.id) AS total_favorites
-
      FROM favorites
-
-     JOIN products
-     ON favorites.product_id = products.id
-
-     JOIN users
-     ON products.user_id = users.id
-
-     GROUP BY products.id
-
+     JOIN products ON favorites.product_id = products.id
+     JOIN users ON products.user_id = users.id
+     GROUP BY products.id, products.title, users.name
      ORDER BY total_favorites DESC
-
      LIMIT 10"
 );
 
@@ -435,7 +424,6 @@ $favoriteProducts = mysqli_query(
         <tr class="products-header">
 
             <th>ID</th>
-            <th>Image</th>
             <th>Product</th>
             <th>Seller</th>
             <th>Wishlist Count</th>
