@@ -28,7 +28,7 @@ CREATE TABLE `favorites` (
   `product_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,7 +37,7 @@ CREATE TABLE `favorites` (
 
 LOCK TABLES `favorites` WRITE;
 /*!40000 ALTER TABLE `favorites` DISABLE KEYS */;
-INSERT INTO `favorites` VALUES (1,1,2,'2026-05-12 05:12:23'),(4,4,2,'2026-05-15 16:55:27'),(7,5,2,'2026-05-16 15:18:19');
+INSERT INTO `favorites` VALUES (1,1,2,'2026-05-12 05:12:23'),(7,5,2,'2026-05-16 15:18:19'),(8,4,12,'2026-05-17 14:56:03');
 /*!40000 ALTER TABLE `favorites` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -63,7 +63,7 @@ CREATE TABLE `messages` (
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `messages_ibfk_3` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -72,8 +72,36 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-INSERT INTO `messages` VALUES (1,12,5,4,'Hello',1,'2026-05-16 15:17:45'),(2,12,5,4,'Hello',1,'2026-05-16 15:36:34'),(3,12,4,5,'Yes ?',1,'2026-05-16 15:52:22');
+INSERT INTO `messages` VALUES (1,12,5,4,'Hello',1,'2026-05-16 15:17:45'),(2,12,5,4,'Hello',1,'2026-05-16 15:36:34'),(3,12,4,5,'Yes ?',1,'2026-05-16 15:52:22'),(4,12,4,5,'ok',1,'2026-05-17 14:56:30'),(5,12,4,5,'Check message',1,'2026-05-17 15:02:03'),(6,12,4,5,'check',1,'2026-05-17 16:30:00'),(7,12,5,4,'Hello jaspreet',1,'2026-05-17 16:31:28'),(8,12,4,5,'Hey !',1,'2026-05-17 16:31:35'),(9,12,5,4,'I would love to buy your product',1,'2026-05-17 16:31:51'),(10,12,4,5,'Can we discuss the price?',1,'2026-05-17 16:37:28'),(11,12,5,4,'Yes sure',1,'2026-05-17 16:42:15'),(12,12,5,4,'Hello ?',1,'2026-05-18 13:22:21'),(13,12,4,5,'Yes ma\'am?',1,'2026-05-19 16:06:39'),(14,12,5,4,'Can we close the deal?',1,'2026-05-19 16:06:50'),(15,12,4,5,'ok sure',1,'2026-05-19 16:42:55');
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `product_images`
+--
+
+DROP TABLE IF EXISTS `product_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `product_images` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `product_images_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product_images`
+--
+
+LOCK TABLES `product_images` WRITE;
+/*!40000 ALTER TABLE `product_images` DISABLE KEYS */;
+INSERT INTO `product_images` VALUES (1,1,'1778519721_Screenshot 2026-04-10 163542.png','2026-05-19 19:14:04'),(2,2,'1778575231_Screenshot 2026-04-23 192935.png','2026-05-19 19:14:04'),(3,12,'1778944246_Screenshot 2026-04-02 124048.png','2026-05-19 19:14:04'),(4,13,'1779223524_6a0ccbe4d8023_Screenshot 2026-05-20 021421.png','2026-05-19 20:45:24'),(5,13,'1779223524_6a0ccbe4db0cb_Screenshot 2026-05-20 021424.png','2026-05-19 20:45:24'),(6,13,'1779223524_6a0ccbe4ddb54_Screenshot 2026-05-20 021428.png','2026-05-19 20:45:24');
+/*!40000 ALTER TABLE `product_images` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -90,11 +118,12 @@ CREATE TABLE `products` (
   `description` text COLLATE utf8mb4_general_ci NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `location` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `condition` enum('new','used','refurbished') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'used',
   `category` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `image` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `status` enum('active','sold') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -103,7 +132,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,1,'dsgds','dsGsd',15000.00,'gdsgds','Mobiles','1778519721_Screenshot 2026-04-10 163542.png','2026-05-11 11:45:21'),(2,1,'LAPTOP','NEW LAPTOP ONLY ONE MONTH USED',20000.00,'JHARKHAND','Electronics','1778575231_Screenshot 2026-04-23 192935.png','2026-05-12 03:10:31'),(12,4,'Test try 2','Hoping it works',100.00,'Jamshedpur','Mobiles','1778944246_Screenshot 2026-04-02 124048.png','2026-05-16 15:10:46');
+INSERT INTO `products` VALUES (1,1,'dsgds','dsGsd',15000.00,'gdsgds','used','Mobiles','active','2026-05-11 11:45:21'),(2,1,'LAPTOP','NEW LAPTOP ONLY ONE MONTH USED',20000.00,'JHARKHAND','used','Electronics','active','2026-05-12 03:10:31'),(12,4,'Test try 2','Hoping it works',100.00,'Jamshedpur','new','Mobiles','sold','2026-05-16 15:10:46'),(13,4,'Laptop','Multiple uploads check',75000.00,'Jamshedpur','new','Electronics','active','2026-05-19 20:45:24');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -147,4 +176,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-17 20:09:03
+-- Dump completed on 2026-05-20 10:07:38
