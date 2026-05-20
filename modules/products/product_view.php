@@ -236,7 +236,7 @@ if(isset($_SESSION['user_id'])){
             </div>
 
             <?php if (!isset($_SESSION['user_id'])): ?>
-                <a href="../auth/login.php" class="btn btn-chat">🔒 Login to Chat</a>
+                <a href="<?php echo BASE_URL; ?>login.php" class="btn btn-chat">🔒 Login to Chat</a>
             
             <?php elseif ($_SESSION['user_id'] == $product['user_id']): ?>
                 <a href="edit-product.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">✏️ Edit Your Ad</a>
