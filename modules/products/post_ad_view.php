@@ -12,6 +12,8 @@ $message = "";
 
 if($_SERVER['REQUEST_METHOD'] == "POST"){
     require_once __DIR__ . '/product_actions.php';
+    // Remember to update your postProduct function in product_actions.php 
+    // to handle loop array processing for $_FILES['images'] instead of single 'image'.
     $message = postProduct($conn);
 }
 ?>
@@ -42,203 +44,157 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 
         a { text-decoration: none; color: inherit; }
 
-        /* NAVBAR (white for contrast) */
-       /* NAVBAR */
-.navbar {
-    background: #fff;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-    display: flex;
-    align-items: center;
-    padding: 0 2rem;
-    height: 64px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--primary);
-}
-.logo span { color: var(--teal); }
-.logo-img {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--primary);
-}
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: auto;
-}
+        /* NAVBAR */
+        .navbar {
+            background: #fff;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .logo span { color: var(--teal); }
+        .logo-img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
 
-.nav-links a {
-    font-size: 0.88rem;
-    font-weight: bold;
-    color: var(--text);
-    padding: 0.4rem 0.75rem;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    position: relative;   /* needed for underline */
-    text-decoration: none;
-}
-/* Animated li*/
-.nav-links a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -5px;
-    width: 0;
-    height: 3px;
-    background: #4338ca;  
-    border-radius: 10px;
-    transition: width 0.3s ease;
-}
-.nav-links a:hover::after {
-    width: 100%;
-}
+        .nav-links a {
+            font-size: 0.88rem;
+            font-weight: bold;
+            color: var(--text);
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            position: relative;
+            text-decoration: none;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 0;
+            height: 3px;
+            background: #4338ca;  
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
 
-.nav-links a:not(.btn-primary):hover {
-    background: #f4f7ff;
-}
-/* SELL button*/
-.btn-primary {
-    background: linear-gradient(135deg, #1a3fc4, #0ea5a0) !important;
-    color: #fff !important;
-    font-weight: 700;
-    border-radius: 8px;
-    padding: 0.42rem 1.1rem !important;
-    transition: opacity 0.2s, transform 0.15s;
-}
-.btn-primary:hover {
-    background: linear-gradient(135deg, #1a3fc4, #0ea5a0) !important;
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
+        .nav-links a:not(.btn-primary):hover {
+            background: #f4f7ff;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1a3fc4, #0ea5a0) !important;
+            color: #fff !important;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 0.42rem 1.1rem !important;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1a3fc4, #0ea5a0) !important;
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
 
-.nav-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1a3fc4, #0ea5a0);
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: 2px solid #dde4f5;
-    transition: opacity 0.2s;
-}
-.nav-avatar:hover {
-    opacity: 0.9;
-}
+        .profile-dropdown {
+            position: relative;
+        }
+        .nav-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a3fc4, #0ea5a0);
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #dde4f5;
+            transition: opacity 0.2s;
+        }
+        .nav-avatar:hover {
+            opacity: 0.9;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: -4px;          
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+            min-width: 200px;
+            border: 1px solid #dde4f5;
+            overflow: visible;
+            z-index: 200;
+        }
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+        }
 
-.profile-dropdown {
-    position: relative;
-}
-.nav-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1a3fc4, #0ea5a0);
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: 2px solid #dde4f5;
-    transition: opacity 0.2s;
-}
-.nav-avatar:hover {
-    opacity: 0.9;
-}
-/* PROFILE DROPDOWN */
-.profile-dropdown {
-    position: relative;
-}
-.nav-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1a3fc4, #0ea5a0);
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: 2px solid #dde4f5;
-    transition: opacity 0.2s;
-}
-.nav-avatar:hover {
-    opacity: 0.9;
-}
-.dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: -4px;          
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.10);
-    min-width: 200px;
-    border: 1px solid #dde4f5;
-    overflow: visible;
-    z-index: 200;
-   
-}
-.profile-dropdown:hover .dropdown-content {
-    display: block;
-}
+        .profile-dropdown::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: transparent;
+        }
+        .dropdown-user-meta { padding: 0.75rem 1rem 0.45rem; font-size: 0.86rem; color: #6b7280; }
+        .dropdown-content hr { border: none; border-top: 1px solid #dde4f5; margin: 3px 0; }
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.8rem 1rem;   
+            font-size: 0.86rem;
+            color: #1a1a2e;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .dropdown-content a i { width: 15px; color: var(--primary); }
+        .dropdown-content a:hover { background: #f4f7ff; }
+        .dropdown-badge {
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.66rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 20px;
+            margin-left: auto;
+        }
 
-.profile-dropdown::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 100%;
-    height: 12px;
-    background: transparent;
-}
-.dropdown-user-meta { padding: 0.75rem 1rem 0.45rem; font-size: 0.86rem; color: #6b7280; }
-.dropdown-content hr { border: none; border-top: 1px solid #dde4f5; margin: 3px 0; }
-.dropdown-content a {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.8rem 1rem;   
-    font-size: 0.86rem;
-    color: #1a1a2e;
-    transition: background 0.2s;
-    position: relative;
-}
-.dropdown-content a i { width: 15px; color: var(--primary); }
-.dropdown-content a:hover { background: #f4f7ff; }
-.dropdown-badge {
-    background: #ef4444;
-    color: #fff;
-    font-size: 0.66rem;
-    font-weight: 700;
-    padding: 0.1rem 0.4rem;
-    border-radius: 20px;
-    margin-left: auto;
-}
-
-     
         .page-wrap {
             max-width: 690px;
             margin: 1rem auto;
@@ -247,7 +203,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
             border-radius: 24px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(26,63,196,0.2);
-            max-height: 91vh;
+            /* Removed restrictive max-height to avoid scrollbars with multi-preview */
+            min-height: auto;
         }
 
         .page-title {
@@ -283,7 +240,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
             color: var(--text);
             margin-bottom: 0.45rem;
         }
-        /* Grey icons next to labels */
         .form-group label i {
             margin-right: 0.5rem;
             color: #6b7280;
@@ -363,24 +319,88 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         .upload-zone p { font-size: 0.85rem; color: var(--muted); }
         .upload-zone span { color: var(--primary); font-weight: 600; }
 
-        #preview-wrap {
-            display: none; margin-top: 0.75rem;
-            border-radius: 10px; overflow: hidden;
+        /* MULTI-IMAGE ADVANCED PREVIEW ARCHITECTURE */
+        #preview-container {
+            display: none;
+            margin-top: 1rem;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        /* Main view display screen box */
+        .main-preview-viewport {
+            width: 100%;
+            height: 240px;
+            border-radius: 14px;
             border: 1.5px solid var(--border);
+            overflow: hidden;
             position: relative;
+            background: #f8fafc;
         }
-        #preview-wrap img {
-            width: 100%; max-height: 180px; object-fit: cover; display: block;
+        .main-preview-viewport img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #111827;
+            display: block;
         }
-        #preview-wrap .remove-img {
-            position: absolute; top: 7px; right: 7px;
-            background: rgba(0,0,0,0.5); color: #fff;
+        
+        /* Floating Picture Counter Tag Indicator (e.g., 1/5) */
+        .preview-counter-tag {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            z-index: 5;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* Clear and reset upload array button */
+        .main-preview-viewport .remove-img {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(239, 68, 68, 0.9); color: #fff;
             border: none; border-radius: 50%;
-            width: 26px; height: 26px; cursor: pointer;
+            width: 32px; height: 32px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.72rem; transition: background 0.2s;
+            font-size: 0.9rem; transition: background 0.2s, transform 0.1s;
+            z-index: 6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        #preview-wrap .remove-img:hover { background: #ef4444; }
+        .main-preview-viewport .remove-img:hover { background: #dc2626; transform: scale(1.05); }
+
+        /* Underneath dynamic thumbnail line deck tracking box */
+        .thumbnail-preview-track {
+            display: flex;
+            gap: 0.6rem;
+            overflow-x: auto;
+            padding: 4px 2px;
+        }
+        .thumb-node {
+            width: 65px;
+            height: 65px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2.5px solid #e2e8f0;
+            background: #fff;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Neon-Teal/Cyan Radiant Glow when active/viewed */
+        .thumb-node.active-glow {
+            border-color: #00f2fe;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.85), 
+                        0 0 4px rgba(14, 165, 160, 0.5);
+            transform: translateY(-2px) scale(1.03);
+        }
 
         /* DIVIDER */
         .form-divider {
@@ -388,9 +408,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
             margin: 1.5rem 0;
         }
         .dropdown-content a.logout-link,
-.dropdown-content a.logout-link i {
-    color: #ef4444 !important;
-}
+        .dropdown-content a.logout-link i {
+            color: #ef4444 !important;
+        }
         /* SUBMIT */
         .submit-btn {
             width: 100%; padding: 13px;
@@ -422,7 +442,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div class="navbar">
     <div class="logo">
         <img src="assets/images/logo.png" alt="BikriBazaar" class="logo-img"
@@ -430,7 +449,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         Bikri<span>Bazaar</span>
     </div>
     <div class="nav-links">
-<a href="index.php"><i class="fa-solid fa-house"></i> <span style="font-weight: bold;">Home</span></a> <?php if(isset($_SESSION['user_id'])): ?>
+        <a href="index.php"><i class="fa-solid fa-house"></i> <span style="font-weight: bold;">Home</span></a> 
+        <?php if(isset($_SESSION['user_id'])): ?>
             <a href="post-ad.php" class="btn-primary">
                 <i class="fa-solid fa-plus"></i> SELL
             </a>
@@ -448,8 +468,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
                     <a href="inbox.php"><i class="fa-solid fa-message"></i> Messages</a>
                     <hr>
                     <a href="logout.php" class="logout-link">
-    <i class="fa-solid fa-right-from-bracket"></i> Logout
-</a>
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </a>
                 </div>
             </div>
         <?php else: ?>
@@ -459,7 +479,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     </div>
 </div>
 
-<!-- FORM -->
 <div class="page-wrap">
 
     <div class="page-title">Post Your Ad</div>
@@ -530,20 +549,26 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         <hr class="form-divider">
 
         <div class="form-group">
-            <label for="image"><i class="fa-solid fa-camera"></i> Product Photo</label>
+            <label for="images"><i class="fa-solid fa-camera"></i> Product Photos (Up to 6 images)</label>
             <div class="upload-zone" id="uploadZone">
-                <input type="file" id="image" name="image"
-                       accept="image/*" required
-                       onchange="previewImage(this)">
+                <input type="file" id="images" name="images[]"
+                       accept="image/*" multiple required
+                       onchange="processImages(this)">
                 <i class="fa-solid fa-cloud-arrow-up"></i>
                 <p><span>Click to upload</span> or drag &amp; drop</p>
-                <p style="margin-top:0.3rem;">JPG, PNG, GIF &bull; Max 5MB</p>
+                <p style="margin-top:0.3rem;">Upload up to 6 images &bull; JPG, PNG, GIF &bull; Max 5MB each</p>
             </div>
-            <div id="preview-wrap">
-                <img id="preview-img" src="" alt="Preview">
-                <button type="button" class="remove-img" onclick="removeImage()">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+            
+            <div id="preview-container">
+                <div class="main-preview-viewport">
+                    <img id="viewport-active-img" src="" alt="Main Display View">
+                    <div class="preview-counter-tag" id="imageCounter">0 / 0</div>
+                    <button type="button" class="remove-img" onclick="clearImageTrack()">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+                <div class="thumbnail-preview-track" id="thumbnailTrack">
+                    </div>
             </div>
         </div>
 
@@ -555,20 +580,100 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 </div>
 
 <script>
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
+    // Global tracker array to keep base64 strings
+    let imagePool = [];
+
+    function processImages(input) {
+        const container = document.getElementById('preview-container');
+        const track = document.getElementById('thumbnailTrack');
+        
+        if (!input.files) return;
+        
+        // Enforce hard block limit of 6 files
+        const fileCount = Math.min(input.files.length, 6);
+        if(input.files.length > 6) {
+            alert("System Alert: You can only select up to 6 photos. The first 6 have been loaded.");
+        }
+        
+        // Reset old local tracking pool contents
+        imagePool = [];
+        track.innerHTML = "";
+        
+        let loadedCount = 0;
+        
+        for (let i = 0; i < fileCount; i++) {
             const reader = new FileReader();
-            reader.onload = e => {
-                document.getElementById('preview-img').src = e.target.result;
-                document.getElementById('preview-wrap').style.display = 'block';
+            reader.onload = (e) => {
+                imagePool.push(e.target.result);
+                loadedCount++;
+                
+                // Once all targeted files are read successfully, compile the interface view deck
+                if (loadedCount === fileCount) {
+                    renderPreviewTrack();
+                }
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(input.files[i]);
         }
     }
-    function removeImage() {
-        document.getElementById('image').value = '';
-        document.getElementById('preview-wrap').style.display = 'none';
+
+    function renderPreviewTrack() {
+        const container = document.getElementById('preview-container');
+        const track = document.getElementById('thumbnailTrack');
+        const viewport = document.getElementById('viewport-active-img');
+        
+        if (imagePool.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Display preview module block 
+        container.style.display = 'flex';
+        
+        // Render each thumbnail into track timeline link map
+        imagePool.forEach((sourceUrl, index) => {
+            const thumb = document.createElement('img');
+            thumb.src = sourceUrl;
+            thumb.className = 'thumb-node';
+            thumb.alt = `Thumbnail ${index + 1}`;
+            
+            // Onclick handler switch view and adjust active glowing state node
+            thumb.onclick = () => switchToImage(index);
+            track.appendChild(thumb);
+        });
+        
+        // Auto initialize focusing presentation screen to image position 0
+        switchToImage(0);
     }
+
+    function switchToImage(index) {
+        if (index < 0 || index >= imagePool.length) return;
+        
+        // Update viewport display image
+        document.getElementById('viewport-active-img').src = imagePool[index];
+        
+        // Update dynamic 1/X style position indicator count text strings
+        document.getElementById('imageCounter').innerText = `${index + 1} / ${imagePool.length}`;
+        
+        // Clear all active glows out from other track nodes
+        const nodes = document.querySelectorAll('.thumb-node');
+        nodes.forEach(node => node.classList.remove('active-glow'));
+        
+        // Append neon-cyan glowing frame focus filter only to selected target thumb index
+        if(nodes[index]) {
+            nodes[index].classList.add('active-glow');
+            // Ensure smooth scroll tracking into view context inside container alignment maps
+            nodes[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    function clearImageTrack() {
+        document.getElementById('images').value = '';
+        imagePool = [];
+        document.getElementById('thumbnailTrack').innerHTML = "";
+        document.getElementById('preview-container').style.style.display = 'none';
+    }
+
+    // Drag zone border animations bindings
     const zone = document.getElementById('uploadZone');
     zone.addEventListener('dragover',  e => { e.preventDefault(); zone.style.borderColor = 'var(--primary)'; });
     zone.addEventListener('dragleave', () => { zone.style.borderColor = '#999999'; });
