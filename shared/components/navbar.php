@@ -100,6 +100,7 @@
     .profile-dropdown {
         position: relative;
     }
+    /* Updated: support both text and image */
     .nav-avatar {
         width: 36px;
         height: 36px;
@@ -114,6 +115,12 @@
         cursor: pointer;
         border: 2px solid var(--border);
         transition: opacity 0.2s;
+        overflow: hidden;
+    }
+    .nav-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
     .nav-avatar:hover {
         opacity: 0.9;
@@ -172,7 +179,6 @@
     .dropdown-content a:hover {
         background: #f4f7ff;
     }
-    /* Underline for dropdown links (optional) */
     .dropdown-content a::after {
         content: '';
         position: absolute;
@@ -220,14 +226,23 @@
             </a>
             <div class="profile-dropdown">
                 <div class="nav-avatar">
-                    <?php echo isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U'; ?>
+                    <?php 
+                    // Show profile image if exists, otherwise show first letter
+                    if (!empty($_SESSION['profile_image'])): 
+                        // Build the correct image URL (assuming BASE_URL is defined)
+                        $image_path = BASE_URL . 'uploads/profiles/' . $_SESSION['profile_image'];
+                    ?>
+                        <img src="<?php echo $image_path; ?>" alt="Profile" 
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='<?php echo isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U'; ?>';">
+                    <?php else: ?>
+                        <?php echo isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U'; ?>
+                    <?php endif; ?>
                 </div>
                 <div class="dropdown-content">
                     <div class="dropdown-user-meta">
                         <strong>Hi, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User'; ?></strong>
                     </div>
                     <hr>
-                    <!-- Edit Profile link added (from upstream) -->
                     <a href="profile.php"><i class="fa-solid fa-user-circle"></i> Edit Profile</a>
                     <a href="my-ads.php"><i class="fa-solid fa-list"></i> My Ads</a>
                     <a href="favorites.php"><i class="fa-solid fa-heart"></i> Favorites</a>
@@ -246,7 +261,6 @@
         <?php else: ?>
             <a href="login.php"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
             <?php 
-            // Hide Register link if $hide_register is true (e.g., on registration page)
             if (!isset($hide_register) || $hide_register !== true):
             ?>
                 <a href="register.php" class="btn-register">

@@ -64,6 +64,7 @@ if (!empty($receiver_id)) {
             display: flex;
             flex-direction: column;
             height: calc(100vh - 90px);
+            width:28em;
         }
         .chat-header {
             background: var(--card-bg);
@@ -102,7 +103,7 @@ if (!empty($receiver_id)) {
             flex-direction: column;
             gap: 1rem;
             margin-bottom: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 14px 40px #a4afd5;
         }
         /* Message bubbles */
         .message-wrapper {
