@@ -222,7 +222,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && !isset($_POST['ajax_delete_image'])){
         }
 
         body {
-            background: linear-gradient(135deg, #0d4b8f 0%, #00a896 100%);
+            background: linear-gradient(135deg, #1a3fc4 0%, #0ea5a0 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
