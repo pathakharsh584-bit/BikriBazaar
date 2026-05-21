@@ -12,7 +12,6 @@ global $conn;
 
 $user_id = $_SESSION['user_id'];
 
-
 $unread_count = 0;
 $unread_sql = "SELECT COUNT(*) as total FROM messages WHERE receiver_id = ? AND is_seen = 0";
 $unread_stmt = mysqli_prepare($conn, $unread_sql);
@@ -69,176 +68,14 @@ $total_favorites = mysqli_num_rows($result);
 
         a { text-decoration: none; color: inherit; }
 
-        /* NAVBAR */
-        .navbar {
-            background: #fff;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-            display: flex;
-            align-items: center;
-            padding: 0 2rem;
-            height: 64px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-        .logo span { color: var(--teal); }
-        .logo-img {
-            height: 40px;
-            width: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary);
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-left: auto;
-        }
-        .nav-links a {
-            font-size: 0.88rem;
-            font-weight: 500;
-            color: var(--text);
-            padding: 0.4rem 0.75rem;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            position: relative;
-            text-decoration: none;
-        }
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -5px;
-            width: 0;
-            height: 3px;
-            background: #4338ca;
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-        .nav-links a:not(.btn-primary):hover {
-            background: #f4f7ff;
-        }
-        .btn-primary {
-            background: var(--grad) !important;
-            color: #fff !important;
-            font-weight: 700;
-            border-radius: 8px;
-            padding: 0.42rem 1.1rem !important;
-            transition: opacity 0.2s, transform 0.15s;
-        }
-        .btn-primary:hover {
-            background: var(--grad) !important;
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        .profile-dropdown {
-            position: relative;
-        }
-        .nav-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--grad);
-            color: #fff;
-            font-weight: 800;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 2px solid #dde4f5;
-            transition: opacity 0.2s;
-        }
-        .nav-avatar:hover {
-            opacity: 0.9;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: -4px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.10);
-            min-width: 200px;
-            border: 1px solid #dde4f5;
-            overflow: visible;
-            z-index: 200;
-        }
-        .profile-dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .profile-dropdown::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100%;
-            height: 12px;
-            background: transparent;
-        }
-        .dropdown-user-meta {
-            padding: 0.75rem 1rem 0.45rem;
-            font-size: 0.86rem;
-            color: #6b7280;
-        }
-        .dropdown-content hr {
-            border: none;
-            border-top: 1px solid #dde4f5;
-            margin: 3px 0;
-        }
-        .dropdown-content a {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.8rem 1rem;
-            font-size: 0.86rem;
-            color: #1a1a2e;
-            transition: background 0.2s;
-            position: relative;
-        }
-        .dropdown-content a i {
-            width: 15px;
-            color: var(--primary);
-        }
-        .dropdown-content a:hover {
-            background: #f4f7ff;
-        }
-        .dropdown-badge {
-            background: #ef4444;
-            color: #fff;
-            font-size: 0.66rem;
-            font-weight: 700;
-            padding: 0.1rem 0.4rem;
-            border-radius: 20px;
-            margin-left: auto;
-        }
-        .dropdown-content a.logout-link,
-        .dropdown-content a.logout-link i {
-            color: #ef4444 !important;
-        }
+        /* ===== NAVBAR CSS REMOVED – styles come from shared/components/navbar.php ===== */
 
         /* PAGE CONTENT */
         .container {
             max-width: 1100px;
             margin: 2rem auto;
             padding: 11px 3.5rem;
-            border: 1px solid #9ca4bf;
+            border: 1px solid #fff;
             border-radius: 9px;
         }
 
@@ -364,7 +201,6 @@ $total_favorites = mysqli_num_rows($result);
 
         /* RESPONSIVE */
         @media (max-width: 640px) {
-            .navbar { padding: 0 1rem; }
             .container { padding: 0 1rem; }
             .products-grid { grid-template-columns: 1fr; }
         }
@@ -372,48 +208,8 @@ $total_favorites = mysqli_num_rows($result);
 </head>
 <body>
 
-<!-- SHARED NAVBAR -->
-<div class="navbar">
-    <div class="logo">
-        <img src="assets/images/logo.png" alt="BikriBazaar" class="logo-img"
-             onerror="this.style.display='none'">
-        Bikri<span>Bazaar</span>
-    </div>
-    <div class="nav-links">
-        <a href="index.php"><i class="fa-solid fa-house"></i> Home</a>
-        <?php if(isset($_SESSION['user_id'])): ?>
-            <a href="post-ad.php" class="btn-primary">
-                <i class="fa-solid fa-plus"></i> SELL
-            </a>
-            <div class="profile-dropdown">
-                <div class="nav-avatar">
-                    <?php echo strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)); ?>
-                </div>
-                <div class="dropdown-content">
-                    <div class="dropdown-user-meta">
-                        <strong>Hi, <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></strong>
-                    </div>
-                    <hr>
-                    <a href="my-ads.php"><i class="fa-solid fa-list"></i> My Ads</a>
-                    <a href="favorites.php"><i class="fa-solid fa-heart"></i> Favorites</a>
-                    <a href="inbox.php">
-                        <i class="fa-solid fa-message"></i> Messages
-                        <?php if($unread_count > 0): ?>
-                            <span class="dropdown-badge"><?php echo $unread_count; ?></span>
-                        <?php endif; ?>
-                    </a>
-                    <hr>
-                    <a href="logout.php" class="logout-link">
-                        <i class="fa-solid fa-right-from-bracket"></i> Logout
-                    </a>
-                </div>
-            </div>
-        <?php else: ?>
-            <a href="login.php">Login</a>
-            <a href="register.php" class="btn-primary">Register</a>
-        <?php endif; ?>
-    </div>
-</div>
+<!-- ===== SHARED NAVBAR ===== -->
+<?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
 
 <!-- PAGE CONTENT -->
 <div class="container">
