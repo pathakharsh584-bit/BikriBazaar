@@ -28,7 +28,7 @@ CREATE TABLE `favorites` (
   `product_id` int NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -63,7 +63,7 @@ CREATE TABLE `messages` (
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `messages_ibfk_3` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +90,7 @@ CREATE TABLE `product_images` (
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `product_images_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -99,7 +99,7 @@ CREATE TABLE `product_images` (
 
 LOCK TABLES `product_images` WRITE;
 /*!40000 ALTER TABLE `product_images` DISABLE KEYS */;
-INSERT INTO `product_images` VALUES (1,1,'1778519721_Screenshot 2026-04-10 163542.png','2026-05-19 19:14:04'),(2,2,'1778575231_Screenshot 2026-04-23 192935.png','2026-05-19 19:14:04'),(7,14,'1779260020_6a0d5a74a70e4_Screenshot 2026-05-20 021421.png','2026-05-20 06:53:40'),(8,14,'1779260020_6a0d5a74aa4be_Screenshot 2026-05-20 021424.png','2026-05-20 06:53:40'),(9,14,'1779260020_6a0d5a74adc9a_Screenshot 2026-05-20 021431.png','2026-05-20 06:53:40');
+INSERT INTO `product_images` VALUES (11,15,'https://res.cloudinary.com/dagf2tcuh/image/upload/v1779390924/olx_replica/products/ou9oi58boqkfmn22stqf.png','2026-05-21 19:15:25'),(12,15,'https://res.cloudinary.com/dagf2tcuh/image/upload/v1779390927/olx_replica/products/pb0gh02axrxm6qv5y6pz.png','2026-05-21 19:15:28');
 /*!40000 ALTER TABLE `product_images` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -122,7 +122,7 @@ CREATE TABLE `products` (
   `status` enum('active','sold') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -131,7 +131,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,1,'dsgds','dsGsd',15000.00,'gdsgds','used','Mobiles','active','2026-05-11 11:45:21'),(2,1,'LAPTOP','NEW LAPTOP ONLY ONE MONTH USED',20000.00,'JHARKHAND','used','Electronics','active','2026-05-12 03:10:31'),(14,4,'Laptop','Multiple uploads check',75000.00,'Jamshedpur','new','Electronics','active','2026-05-20 06:53:40');
+INSERT INTO `products` VALUES (15,4,'Car','Cloudinary Check',100000.00,'Jamshedpur','used','Cars','active','2026-05-21 19:15:21');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -164,7 +164,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Harsh Pathak','pathakharsh584@gmail.com','$2y$10$eu890BC/KyEbszqtgihBT.96osa/mCkkYq0p8bgHSD88MfLtiW/be',NULL,NULL,'2026-05-10 02:30:42',NULL,NULL,'',NULL),(2,'Harsh Pathak','pathakneetu584@gmail.com','$2y$10$uHIntx3lfjhTmLPiRcJHGOUaPQJPT/cQ9XKiLsQ7U75A7JhakUaB.','09229214413','JAMSHEDPUR','2026-05-11 10:59:37',NULL,NULL,'',NULL),(3,'Harsh Pathak','pathakneet584@gmail.com','$2y$10$AHKYYL2PUicyE4fqLwFK9.ryF9cMHGns0H4s/5olA0qEEvBDBxCQO','09229214413','JAMSHEDPUR','2026-05-12 10:20:30',NULL,NULL,'',NULL),(4,'Jaspreet Kaur','jaspreetsk.2020@gmail.com','$2y$10$Jrz6/i5Qsv6ixG40YVNyeeAtNubFrknbho9yxEz199aOCM256iXZS','9234241658','JAMSHEDPUR','2026-05-12 12:28:06',NULL,NULL,'',NULL),(5,'Satinder','satindergurprit321@gmail.com','$2y$10$lB/3xeow5Z545bDSacJBQONMv.N5yJ7qO7GEZ423tr93f42xaA6Xu','9234241658','Jamshedpur','2026-05-16 15:16:56',NULL,NULL,'',NULL);
+INSERT INTO `users` VALUES (1,'Harsh Pathak','pathakharsh584@gmail.com','$2y$10$eu890BC/KyEbszqtgihBT.96osa/mCkkYq0p8bgHSD88MfLtiW/be',NULL,NULL,'2026-05-10 02:30:42',NULL,NULL,'',NULL),(2,'Harsh Pathak','pathakneetu584@gmail.com','$2y$10$uHIntx3lfjhTmLPiRcJHGOUaPQJPT/cQ9XKiLsQ7U75A7JhakUaB.','09229214413','JAMSHEDPUR','2026-05-11 10:59:37',NULL,NULL,'',NULL),(3,'Harsh Pathak','pathakneet584@gmail.com','$2y$10$AHKYYL2PUicyE4fqLwFK9.ryF9cMHGns0H4s/5olA0qEEvBDBxCQO','09229214413','JAMSHEDPUR','2026-05-12 10:20:30',NULL,NULL,'',NULL),(4,'Jaspreet','jaspreetsk.2020@gmail.com','$2y$10$KGkt8U4tAyGlYO0B/RUP6uq8oRfheCZCDBdOfhQgh8p7eAzz/GdnK','9234241658','JAMSHEDPUR','2026-05-12 12:28:06',NULL,NULL,'',NULL),(5,'Satinder','satindergurprit321@gmail.com','$2y$10$lB/3xeow5Z545bDSacJBQONMv.N5yJ7qO7GEZ423tr93f42xaA6Xu','9234241658','Jamshedpur','2026-05-16 15:16:56',NULL,NULL,'',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -177,4 +177,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-21  0:48:17
+-- Dump completed on 2026-05-22  2:23:16
