@@ -2,12 +2,14 @@
 
 session_start();
 
+// 1. Included config.php so we can use BASE_URL for redirects and placeholders
+require_once __DIR__ . '/../../shared/config.php';
+require_once __DIR__ . '/../../shared/db.php';
+
 if(!isset($_SESSION['user_id'])){
-    header("Location: login.php");
+    header("Location: " . BASE_URL . "login.php");
     exit();
 }
-
-require_once __DIR__ . '/../../shared/db.php';
 
 global $conn;
 
@@ -25,7 +27,7 @@ if($unread_res){
 }
 mysqli_stmt_close($unread_stmt);
 
-//Fetch all products and tally their statuses
+// Fetch all products and tally their statuses
 $sql = "SELECT products.*, 
         (SELECT image_path FROM product_images WHERE product_id = products.id ORDER BY id ASC LIMIT 1) as image 
         FROM products 
@@ -42,7 +44,7 @@ $sold_count = 0;
 
 while($row = mysqli_fetch_assoc($result)) {
     $products[] = $row;
-   
+    
     $status = isset($row['status']) ? $row['status'] : 'active'; 
     if($status == 'active') {
         $active_count++;
@@ -361,10 +363,8 @@ $total_ads = count($products);
 </head>
 <body>
 
-<!-- ===== SHARED NAVBAR ===== -->
 <?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
 
-<!-- PAGE CONTENT -->
 <div class="page">
     <div class="top-bar">
         <div class="top-bar-left">
@@ -400,9 +400,14 @@ $total_ads = count($products);
                 
                 <div class="ad-card <?php echo $is_sold ? 'sold-card' : ''; ?>">
                     <div class="ad-img-wrap">
-                        <img src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
+                        
+                        <?php 
+                            $displayImage = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png';
+                        ?>
+                        <img src="<?php echo htmlspecialchars($displayImage); ?>"
                              alt="<?php echo htmlspecialchars($product['title']); ?>"
                              loading="lazy">
+                        
                         <?php if(!empty($product['category'])): ?>
                             <span class="ad-category"><?php echo htmlspecialchars($product['category']); ?></span>
                         <?php endif; ?>

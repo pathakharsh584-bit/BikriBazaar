@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/db.php';
 
 if(!isset($_GET['id'])){
@@ -24,7 +26,7 @@ if(isset($_SESSION['user_id'])){
 $sql = "SELECT p.*, u.name as seller_name, u.created_at as seller_join_date 
         FROM products p 
         LEFT JOIN users u ON p.user_id = u.id 
-        WHERE p.id = '$product_id'";
+        WHERE p.id = $product_id";
 $result = mysqli_query($conn, $sql);
 
 if(mysqli_num_rows($result) == 0){
@@ -43,7 +45,7 @@ if ($img_result && mysqli_num_rows($img_result) > 0) {
         $images[] = $row['image_path'];
     }
 } else {
-    $images[] = 'default-placeholder.png'; 
+    $images[] = BASE_URL . 'assets/images/logo.png';
 }
 
 // 3. Check if favorited
@@ -316,15 +318,15 @@ if(isset($_SESSION['user_id'])){
     <div class="left-col">
         <div class="gallery-card">
             <div class="main-image-wrap">
-                <img id="mainImage" src="uploads/products/<?php echo htmlspecialchars($images[0]); ?>" alt="Product Image">
+                <img id="mainImage" src="<?php echo htmlspecialchars($images[0]); ?>" alt="Product Image">
             </div>
             <?php if(count($images) > 1): ?>
                 <div class="thumbnails-wrap">
                     <?php foreach($images as $index => $img): ?>
-                        <img src="uploads/products/<?php echo htmlspecialchars($img); ?>" 
-                             class="thumb-img <?php echo ($index == 0) ? 'active' : ''; ?>" 
-                             onclick="changeMainImage(this, 'uploads/products/<?php echo htmlspecialchars($img); ?>')"
-                             alt="Thumbnail">
+                        <img src="<?php echo htmlspecialchars($img); ?>" 
+     class="thumb-img <?php echo ($index == 0) ? 'active' : ''; ?>" 
+     onclick="changeMainImage(this, '<?php echo htmlspecialchars($img); ?>')"
+     alt="Thumbnail">
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>

@@ -6,6 +6,8 @@ if(!isset($_SESSION['user_id'])){
     exit();
 }
 
+// 1. Include config FIRST to establish BASE_URL
+require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/db.php';
 
 global $conn;
@@ -208,10 +210,8 @@ $total_favorites = mysqli_num_rows($result);
 </head>
 <body>
 
-<!-- ===== SHARED NAVBAR ===== -->
 <?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
 
-<!-- PAGE CONTENT -->
 <div class="container">
     <div class="page-header">
         <h1><i class="fa-solid fa-heart" style="color:#ef4444;"></i> My Favorites</h1>
@@ -222,9 +222,14 @@ $total_favorites = mysqli_num_rows($result);
         <div class="products-grid">
             <?php while($product = mysqli_fetch_assoc($result)): ?>
                 <a class="product-card" href="product.php?id=<?php echo $product['id']; ?>">
+                    
+                    <?php 
+                        $displayImage = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png';
+                    ?>
                     <img class="product-image"
-                         src="uploads/products/<?php echo htmlspecialchars($product['image']); ?>"
+                         src="<?php echo htmlspecialchars($displayImage); ?>"
                          alt="<?php echo htmlspecialchars($product['title']); ?>">
+                         
                     <div class="product-content">
                         <div class="price">₹ <?php echo number_format($product['price']); ?></div>
                         <div class="title"><?php echo htmlspecialchars($product['title']); ?></div>

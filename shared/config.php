@@ -1,5 +1,24 @@
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// This looks for your .env file in the root directory
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
+
+use Cloudinary\Configuration\Configuration;
+
+Configuration::instance([
+  'cloud' => [
+    'cloud_name' => $_ENV['CLOUDINARY_CLOUD_NAME'], 
+    'api_key'    => $_ENV['CLOUDINARY_API_KEY'],  
+    'api_secret' => $_ENV['CLOUDINARY_API_SECRET']
+  ],
+  'url' => [
+    'secure' => true // Forces HTTPS
+  ]
+]);
+
 //Detect Protocol (HTTP or HTTPS)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
 

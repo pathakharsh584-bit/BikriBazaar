@@ -11,6 +11,8 @@ session_start();
 require_once __DIR__ . '/../../shared/db.php';
 require_once __DIR__ . '/../../shared/config.php';
 
+use Cloudinary\Api\Upload\UploadApi;
+
 if(!isset($_SESSION['user_id'])){
     header("Location: " . BASE_URL . "login.php");
     exit();
@@ -22,6 +24,20 @@ if(!isset($_GET['id'])){
 
 $product_id = mysqli_real_escape_string($conn, trim($_GET['id']));
 $user_id = intval($_SESSION['user_id']);
+
+// Helper Function: Extracts Cloudinary Public ID from the secure URL
+function extractCloudinaryPublicId($url) {
+    $parts = explode('/upload/', $url);
+    if(isset($parts[1])) {
+        // Remove the version tag (e.g., v17123456/)
+        $pathWithoutVersion = preg_replace('/^v\d+\//', '', $parts[1]);
+        // Strip the extension (e.g., .jpg)
+        $pathInfo = pathinfo($pathWithoutVersion);
+        $dir = $pathInfo['dirname'] === '.' ? '' : $pathInfo['dirname'] . '/';
+        return $dir . $pathInfo['filename']; // Returns: olx_replica/products/xyz123
+    }
+    return null;
+}
 
 // FETCH PRODUCT DETAILS
 $sql = "SELECT * FROM products WHERE id='$product_id' AND user_id='$user_id'";
@@ -50,12 +66,18 @@ if(isset($_GET['delete_image'])){
 
     if($check_result && mysqli_num_rows($check_result) > 0){
         $img_data = mysqli_fetch_assoc($check_result);
-        $file_path = dirname(__DIR__, 2) . '/public/uploads/products/' . $img_data['image_path'];
+        $imageUrl = $img_data['image_path'];
 
         $delete_sql = "DELETE FROM product_images WHERE id='$image_id'";
         if(mysqli_query($conn, $delete_sql)){
-            if(file_exists($file_path)){
-                unlink($file_path);
+            try {
+                $publicId = extractCloudinaryPublicId($imageUrl);
+                if($publicId) {
+                    (new UploadApi())->destroy($publicId);
+                }
+            }
+            catch (Exception $e) {
+                error_log("Failed to delete Cloudinary asset: " . $e->getMessage());
             }
         }
     }
@@ -82,12 +104,18 @@ if(isset($_POST['ajax_delete_image'])){
 
     if($check_result && mysqli_num_rows($check_result) > 0){
         $img_data = mysqli_fetch_assoc($check_result);
-        $file_path = dirname(__DIR__, 2) . '/public/uploads/products/' . $img_data['image_path'];
+        $imageUrl = $img_data['image_path'];
 
         $delete_sql = "DELETE FROM product_images WHERE id='$image_id'";
         if(mysqli_query($conn, $delete_sql)){
-            if(file_exists($file_path)){
-                unlink($file_path);
+          try {
+                $publicId = extractCloudinaryPublicId($imageUrl);
+                if($publicId) {
+                    (new UploadApi())->destroy($publicId);
+                }
+            }
+            catch (Exception $e) {
+                error_log("Failed to delete Cloudinary asset: " . $e->getMessage());
             }
             echo json_encode(['status' => 'success']);
             exit();
@@ -141,13 +169,23 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && !isset($_POST['ajax_delete_image'])){
             $totalFiles = count($_FILES['images']['name']);
             for($i = 0; $i < $totalFiles; $i++) {
                 $tempName = $_FILES['images']['tmp_name'][$i];
-                $originalName = $_FILES['images']['name'][$i];
+                
                 if($tempName != "") {
-                    $imageName = time() . "_" . uniqid() . "_" . basename($originalName);
-                    $uploadPath = dirname(__DIR__, 2) . '/public/uploads/products/' . $imageName;
-                    if(move_uploaded_file($tempName, $uploadPath)) {
-                        $imgSql = "INSERT INTO product_images (product_id, image_path) VALUES ('$product_id', '$imageName')";
+                   try {
+                        // Upload to Cloudinary
+                        $uploadResult = (new UploadApi())->upload($tempName, [
+                            'folder' => 'olx_replica/products',
+                            'resource_type' => 'image'
+                        ]);
+
+                        // Grab URL and insert into DB
+                        $imageUrl = mysqli_real_escape_string($conn, $uploadResult['secure_url']);
+                        $imgSql = "INSERT INTO product_images (product_id, image_path) VALUES ('$product_id', '$imageUrl')";
                         mysqli_query($conn, $imgSql);
+                        
+                    } 
+                    catch (Exception $e) {
+                        error_log("Update Upload Failed: " . $e->getMessage());
                     }
                 }
             }
@@ -718,7 +756,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && !isset($_POST['ajax_delete_image'])){
                     <?php if(count($existing_images) > 0): ?>
                         <?php foreach($existing_images as $img): ?>
                             <div class="img-wrapper" id="img-wrapper-<?php echo $img['id']; ?>">
-                                <img src="uploads/products/<?php echo htmlspecialchars($img['image_path']); ?>" alt="Product image">
+                                <img src="<?php echo htmlspecialchars($img['image_path']); ?>" alt="Product image">
                                 <button type="button" class="delete-img-btn" onclick="deleteImage(<?php echo $img['id']; ?>)">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
