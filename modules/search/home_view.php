@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+// CLOUDINARY UPDATE: Include config to access BASE_URL
+require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/db.php';
 
 $search = "";
@@ -367,8 +370,8 @@ if (isset($_SESSION['user_id'])) {
     <form class="search-form" method="GET" id="searchForm">
         
         <input type="text" name="search" placeholder="Search products, gadgets, cars..."
-               value="<?php echo htmlspecialchars($search); ?>">
-               
+                value="<?php echo htmlspecialchars($search); ?>">
+                
         <select name="category" class="main-select">
             <option value="">All Categories</option>
             <option value="Mobiles"     <?php echo $category=='Mobiles'     ?'selected':''; ?>>Mobiles</option>
@@ -463,8 +466,8 @@ if (isset($_SESSION['user_id'])) {
                 <a class="product-card" href="product.php?id=<?php echo $product['id']; ?>">
                     <div class="featured-badge">FEATURED</div>
                     
-                    <?php $display_image = !empty($product['image']) ? $product['image'] : 'default-placeholder.png'; ?>
-                    <img src="uploads/products/<?php echo htmlspecialchars($display_image); ?>" alt="Product image" loading="lazy">
+                    <?php $display_image = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png'; ?>
+                    <img src="<?php echo htmlspecialchars($display_image); ?>" alt="Product image" loading="lazy">
                     
                     <button class="fav-btn <?php echo $is_fav ? 'is-fav' : ''; ?>"
                             data-product-id="<?php echo intval($product['id']); ?>"

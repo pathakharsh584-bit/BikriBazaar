@@ -230,7 +230,7 @@
                     // Show profile image if exists, otherwise show first letter
                     if (!empty($_SESSION['profile_image'])): 
                         // Build the correct image URL (assuming BASE_URL is defined)
-                        $image_path = BASE_URL . 'uploads/profiles/' . $_SESSION['profile_image'];
+                        $image_path = htmlspecialchars($_SESSION['profile_image']);
                     ?>
                         <img src="<?php echo $image_path; ?>" alt="Profile" 
                              onerror="this.style.display='none'; this.parentElement.innerHTML='<?php echo isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U'; ?>';">

@@ -2,11 +2,29 @@
 
 session_start();
 
+// 1. Include config FIRST to load Cloudinary environment and the BASE_URL constant
+require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/db.php';
+
+use Cloudinary\Api\Upload\UploadApi;
 
 if(!isset($_SESSION['user_id'])){
     header("Location: " . BASE_URL . "login.php");
     exit();
+}
+
+// Helper Function: Extracts Cloudinary Public ID from the secure URL
+function extractCloudinaryPublicId($url) {
+    $parts = explode('/upload/', $url);
+    if(isset($parts[1])) {
+        // Remove the version tag (e.g., v17123456/)
+        $pathWithoutVersion = preg_replace('/^v\d+\//', '', $parts[1]);
+        // Strip the extension (e.g., .jpg)
+        $pathInfo = pathinfo($pathWithoutVersion);
+        $dir = $pathInfo['dirname'] === '.' ? '' : $pathInfo['dirname'] . '/';
+        return $dir . $pathInfo['filename']; // Returns: olx_replica/products/xyz123
+    }
+    return null;
 }
 
 if(isset($_GET['id'])){
@@ -14,7 +32,7 @@ if(isset($_GET['id'])){
     $product_id = intval($_GET['id']);
     $user_id = intval($_SESSION['user_id']);
 
-    // STEP 1: fetch all associated image paths
+    // STEP 1: Fetch all associated image paths (which are now Cloudinary URLs)
     $img_sql = "SELECT pi.image_path 
                 FROM product_images pi 
                 JOIN products p ON pi.product_id = p.id 
@@ -27,19 +45,26 @@ if(isset($_GET['id'])){
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
 
-        // STEP 2: Loop through and delete the physical files from the server folder
+        // STEP 2: Loop through and delete the remote assets from Cloudinary
         while ($row = mysqli_fetch_assoc($result)) {
-            // Reconstruct the exact path used during upload
-            $file_path = dirname(__DIR__, 2) . '/public/uploads/products/' . $row['image_path'];
+            $imageUrl = $row['image_path'];
             
-            // Check if file exists and delete it
-            if (file_exists($file_path) && is_file($file_path)) {
-                unlink($file_path); 
+            try {
+                $publicId = extractCloudinaryPublicId($imageUrl);
+                if($publicId) {
+                    (new UploadApi())->destroy($publicId);
+                }
+            } catch (Exception $e) {
+                // We log the error but do NOT stop the script. 
+                // We still want the user to be able to delete their ad from the DB!
+                error_log("Failed to delete Cloudinary asset during product deletion: " . $e->getMessage());
             }
         }
         mysqli_stmt_close($stmt);
 
         // STEP 3: Delete the product from the database
+        // Note: This assumes your DB has 'ON DELETE CASCADE' set up for product_images.
+        // If not, you should run a query to DELETE FROM product_images first!
         $del_sql = "DELETE FROM products WHERE id = ? AND user_id = ?";
         $del_stmt = mysqli_prepare($conn, $del_sql);
         

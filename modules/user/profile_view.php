@@ -27,7 +27,7 @@ $user = mysqli_fetch_assoc($result);
 $initial = strtoupper(substr($user['name'] ?? 'U', 0, 1));
 $has_image = !empty($user['profile_image']);
 // Build the image URL exactly as in your working version
-$image_url = $has_image ? BASE_URL . 'uploads/profiles/' . htmlspecialchars($user['profile_image']) : '';
+$image_url = $has_image ? htmlspecialchars($user['profile_image']) : '';
 // Add a cache-busting timestamp (changes on every page load)
 $image_url_with_time = $image_url ? $image_url . '?t=' . time() : '';
 ?>
