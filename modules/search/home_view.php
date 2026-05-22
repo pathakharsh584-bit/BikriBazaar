@@ -14,12 +14,12 @@ $sql = "SELECT products.*,
         FROM products WHERE `status` = 'active'";
 
 // Fetch distinct cities for the dynamic dropdown filter
-$city_sql = "SELECT DISTINCT location FROM products WHERE location IS NOT NULL AND location != ''";
+$city_sql = "SELECT DISTINCT city FROM products WHERE city IS NOT NULL AND city != ''";
 $city_res = mysqli_query($conn, $city_sql);
 $cities = [];
 if($city_res) {
     while($row = mysqli_fetch_assoc($city_res)) {
-        $cities[] = trim($row['location']);
+        $cities[] = trim($row['city']); 
     }
 }
 
@@ -47,7 +47,7 @@ if(isset($_GET['max_price']) && $_GET['max_price'] != ""){
 
 if(isset($_GET['city']) && $_GET['city'] != ""){
     $city_filter = mysqli_real_escape_string($conn, trim($_GET['city']));
-    $sql .= " AND location = '$city_filter'";
+    $sql .= " AND city = '$city_filter'"; 
 }
 
 if(isset($_GET['condition']) && is_array($_GET['condition'])){
@@ -480,7 +480,7 @@ if (isset($_SESSION['user_id'])) {
                         <div class="title"><?php echo htmlspecialchars($product['title']); ?></div>
                         <div class="location">
                             <i class="fa-solid fa-location-dot"></i>
-                            <?php echo htmlspecialchars($product['location']); ?>
+                            <?php echo htmlspecialchars($product['city']); ?>
                         </div>
                         <div class="product-time" data-timestamp="<?php echo $product['created_at']; ?>">
                             <i class="fa-regular fa-clock"></i>
