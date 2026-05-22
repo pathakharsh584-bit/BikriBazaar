@@ -63,114 +63,159 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP - BikriBazaar</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --primary: #1a3fc4;
+            --primary:      #1a3fc4;
             --primary-dark: #1530a0;
-            --teal: #0ea5a0;
-            --teal-dark: #0b8a86;
+            --teal:         #0ea5a0;
+            --text:         #1a1a2e;
+            --muted:        #6b7280;
+            --border:       #e2e8f0;
+            --surface:      #eef2ff;
             --grad: linear-gradient(135deg, #1a3fc4 0%, #0ea5a0 100%);
-            --surface: #f4f7ff;
-            --text: #1a1a2e;
-            --muted: #6b7280;
-            --border: #dde4f5;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', sans-serif;
             background: var(--surface);
             color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
         }
 
         a { text-decoration: none; color: inherit; }
 
-        /* OTP CARD */
-        .otp-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1rem;
-        }
-        .otp-card {
-            max-width: 450px;
-            width: 100%;
-            background: #fff;
-            border-radius: 28px;
-            padding: 2rem;
-            box-shadow: 0 20px 35px -8px rgba(26,63,196,0.1);
-            border: 1px solid #989ca7;;
-            text-align: center;
-        }
-        .otp-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--grad);
-            border-radius: 50%;
+        
+        .logo-wrap {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.2rem;
-        }
-        .otp-icon i {
-            font-size: 2rem;
-            color: #fff;
-        }
-        .otp-card h2 {
-            font-size: 1.6rem;
+            gap: 9px;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--primary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 1.8rem;
         }
-        .otp-card p {
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin-bottom: 1.5rem;
+        .logo-wrap span { color: var(--teal); }
+        .logo-wrap img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
         }
-        .form-group {
-            margin-bottom: 1.2rem;
-            border: 1px solid #989ca7;
-            border-radius: 14px;
-}
+
+        /* ── CARD ── */
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border-radius: 18px;
+            border-radius: 18px;
+            border: 1px solid #a1aebf;
+            box-shadow: 0 4px 24px #9ba1bb;
+            overflow: hidden;
         }
-        .input-wrap {
-            position: relative;
+
+        .card-header {
+            padding: 1.6rem 1.8rem 1.3rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+        .icon-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #eef2ff;
             display: flex;
             align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.9rem;
         }
-        .input-wrap i {
-            position: absolute;
-            left: 14px;
+        .icon-circle i {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .card-header h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+        }
+        .card-header p {
+            font-size: 0.81rem;
             color: var(--muted);
-            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* ── BODY ── */
+        .card-body {
+            padding: 1.4rem 1.8rem 1.6rem;
+        }
+
+        /* alert */
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            margin-bottom: 1.1rem;
+        }
+        .alert i { font-size: 0.83rem; flex-shrink: 0; }
+        .alert-error   { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; display: flex; }
+        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; display: flex; }
+        .alert-hidden  { display: none !important; }
+
+        /* form */
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.38rem;
+        }
+        .inp {
+            position: relative;
+        }
+        .inp i {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.8rem;
             pointer-events: none;
         }
-        .input-wrap input {
+        .inp input {
             width: 100%;
-            padding: 12px 12px 12px 42px;
-            border: 1.5px solid var(--border);
-            border-radius: 14px;
-            font-size: 0.95rem;
+            padding: 11px 11px 11px 33px;
+            border: 1.5px solid #a1aebf;
+            border-radius: 9px;
+            font-size: 0.9rem;
             font-family: inherit;
+            color: var(--text);
+            background: #f8faff;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background: #fafcff;
+            transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
         }
-        .input-wrap input:focus {
+        .inp input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(26,63,196,0.1);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(26,63,196,0.08);
         }
+
+        /* gradient button */
         .auth-btn {
             width: 100%;
             padding: 12px;
@@ -188,134 +233,177 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             gap: 0.5rem;
             margin-top: 0.3rem;
         }
-        .auth-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
         .auth-btn:hover:not(:disabled) {
-            opacity: 0.9;
+            opacity: 0.92;
             transform: translateY(-2px);
         }
+        .auth-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* spinner inside button */
+        .spinner {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* back link */
         .back-link {
-            margin-top: 1.2rem;
+            text-align: center;
+            margin-top: 1.1rem;
+            font-size: 0.8rem;
+            color: var(--muted);
         }
         .back-link a {
             color: var(--primary);
             font-weight: 600;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
         }
-        .message {
-            padding: 10px;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-            text-align: center;
-            display: none;
-        }
-        .msg-error {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-            display: block;
-        }
-        .msg-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-            display: block;
+        .back-link a:hover {
+            text-decoration: underline;
         }
 
-        @media (max-width: 480px) {
-            .otp-card { padding: 1.5rem; }
-            .otp-icon { width: 55px; height: 55px; }
-            .otp-icon i { font-size: 1.5rem; }
+        /* hint (optional) */
+        .hint {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+        }
+        .hint i {
+            color: var(--teal);
+            font-size: 0.68rem;
         }
     </style>
 </head>
 <body>
 
-<div class="otp-wrapper">
-    <div class="otp-card">
-        <div class="otp-icon">
+<!-- LOGO (clickable) -->
+<a href="index.php" class="logo-wrap">
+    <img src="assets/images/logo.png" alt="BikriBazaar" onerror="this.style.display='none'">
+    Bikri<span>Bazaar</span>
+</a>
+
+<!-- CARD -->
+<div class="card">
+    <div class="card-header">
+        <div class="icon-circle">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h2>Verify OTP</h2>
+        <h1>Verify OTP</h1>
         <p>Enter the 6‑digit code sent to your email</p>
+    </div>
 
-        <div id="ajax-message" class="message <?php echo ($message != '') ? 'msg-error' : ''; ?>">
-            <?php echo $message; ?>
+    <div class="card-body">
+
+        <!-- ALERT MESSAGE -->
+        <div id="ajax-message" class="alert alert-hidden">
+            <i class="fa-solid fa-circle-exclamation" id="alert-icon"></i>
+            <span id="alert-text"></span>
         </div>
+
+        <?php if($message != ''): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function(){
+                const box = document.getElementById('ajax-message');
+                box.classList.remove('alert-hidden');
+                box.classList.add('alert-error');
+                document.getElementById('alert-text').innerText = <?php echo json_encode($message); ?>;
+            });
+        </script>
+        <?php endif; ?>
 
         <form method="POST" id="otpForm">
             <div class="form-group">
-                <div class="input-wrap">
-                    
-                    <input type="text" name="otp" placeholder="Enter OTP" required autocomplete="off">
+                <label for="otp">One‑Time Password</label>
+                <div class="inp">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="text" id="otp" name="otp" placeholder="Enter OTP" required autocomplete="off">
+                </div>
+                <div class="hint">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Valid for 10 minutes</span>
                 </div>
             </div>
-            <button class="auth-btn" type="submit" id="submitBtn">
-                <i class="fa-solid fa-check-circle"></i> Verify OTP
+
+            <button type="submit" class="auth-btn" id="submitBtn">
+                <div class="spinner" id="spinner"></div>
+                <i class="fa-solid fa-check-circle" id="btn-icon"></i>
+                <span id="btn-text">Verify OTP</span>
             </button>
         </form>
 
         <div class="back-link">
             <a href="forgot-password.php"><i class="fa-solid fa-arrow-left"></i> Back to Forgot Password</a>
         </div>
+
     </div>
 </div>
 
 <script>
 document.getElementById('otpForm').addEventListener('submit', function(e) {
-    e.preventDefault(); 
+    e.preventDefault();
 
-    const submitBtn = document.getElementById('submitBtn');
+    const submitBtn  = document.getElementById('submitBtn');
+    const spinner    = document.getElementById('spinner');
+    const btnIcon    = document.getElementById('btn-icon');
+    const btnText    = document.getElementById('btn-text');
     const messageBox = document.getElementById('ajax-message');
-    
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
-    submitBtn.disabled = true;
-    messageBox.style.display = 'none';
-    messageBox.className = 'message';
+
+    // loading state
+    submitBtn.disabled  = true;
+    spinner.style.display  = 'block';
+    btnIcon.style.display  = 'none';
+    btnText.textContent    = 'Verifying...';
+    messageBox.className   = 'alert alert-hidden';
 
     const formData = new FormData(this);
 
     fetch(window.location.href, {
         method: 'POST',
         body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            messageBox.innerHTML = '<i class="fa-solid fa-check-circle"></i> OTP Verified! Redirecting...';
-            messageBox.className = "message msg-success";
-            messageBox.style.display = "block";
-            
+            messageBox.className = 'alert alert-success';
+            document.getElementById('alert-icon').className = 'fa-solid fa-circle-check';
+            document.getElementById('alert-text').textContent = 'OTP Verified! Redirecting...';
+            btnText.textContent = 'Verified!';
             setTimeout(() => {
                 window.location.href = data.redirect;
             }, 1000);
         } else {
-            messageBox.innerHTML = data.message;
-            messageBox.className = "message msg-error";
-            messageBox.style.display = "block";
-            
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            messageBox.className = 'alert alert-error';
+            document.getElementById('alert-icon').className = 'fa-solid fa-circle-exclamation';
+            document.getElementById('alert-text').textContent = data.message;
+            // reset button
+            submitBtn.disabled    = false;
+            spinner.style.display = 'none';
+            btnIcon.style.display = 'inline';
+            btnText.textContent   = 'Verify OTP';
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        messageBox.innerHTML = "An unexpected error occurred.";
-        messageBox.className = "message msg-error";
-        messageBox.style.display = "block";
-        
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+        messageBox.className = 'alert alert-error';
+        document.getElementById('alert-icon').className = 'fa-solid fa-circle-exclamation';
+        document.getElementById('alert-text').textContent = 'An unexpected error occurred. Please try again.';
+        submitBtn.disabled    = false;
+        spinner.style.display = 'none';
+        btnIcon.style.display = 'inline';
+        btnText.textContent   = 'Verify OTP';
     });
 });
 </script>
