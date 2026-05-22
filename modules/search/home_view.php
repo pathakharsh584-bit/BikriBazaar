@@ -8,10 +8,22 @@ require_once __DIR__ . '/../../shared/db.php';
 $search = "";
 $category = "";
 
-
 $sql = "SELECT products.*, 
-        (SELECT image_path FROM product_images WHERE product_id = products.id ORDER BY id ASC LIMIT 1) as image 
-        FROM products WHERE `status` = 'active'";
+        (SELECT image_path 
+         FROM product_images 
+         WHERE product_id = products.id 
+         ORDER BY id ASC LIMIT 1) as image,
+         
+        CASE
+            WHEN products.boost_type IS NULL 
+                 OR products.boost_type = '' 
+                 OR LOWER(products.boost_type) = 'free'
+            THEN ''
+            ELSE UPPER(products.boost_type)
+        END as plan_badge
+
+        FROM products 
+        WHERE `status` = 'active'";
 
 // Fetch distinct cities for the dynamic dropdown filter
 $city_sql = "SELECT DISTINCT city FROM products WHERE city IS NOT NULL AND city != ''";
@@ -258,7 +270,15 @@ if (isset($_SESSION['user_id'])) {
         .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(26,63,196,0.13); border-color: var(--teal); }
         .product-card img { width: 100%; height: 175px; object-fit: cover; display: block; transition: transform 0.35s; }
         .product-card:hover img { transform: scale(1.04); }
+        .boosted-card {
+    border: 2px solid #f59e0b;
+    box-shadow: 0 6px 24px rgba(245, 158, 11, 0.18);
+}
 
+.boosted-card:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.28);
+}
         .featured-badge {
             position: absolute; top: 9px; left: 9px; background: var(--grad); color: #fff;
             font-size: 0.62rem; font-weight: 800; padding: 0.18rem 0.55rem; border-radius: 20px;
@@ -463,31 +483,43 @@ if (isset($_SESSION['user_id'])) {
                 // Check if this product is already in the current user's favourites
                 $is_fav = in_array(intval($product['id']), $user_favourites);
             ?>
-                <a class="product-card" href="product.php?id=<?php echo $product['id']; ?>">
-                    <div class="featured-badge">FEATURED</div>
-                    
-                    <?php $display_image = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png'; ?>
-                    <img src="<?php echo htmlspecialchars($display_image); ?>" alt="Product image" loading="lazy">
-                    
-                    <button class="fav-btn <?php echo $is_fav ? 'is-fav' : ''; ?>"
-                            data-product-id="<?php echo intval($product['id']); ?>"
-                            title="<?php echo $is_fav ? 'Remove from Favourites' : 'Save to Favourites'; ?>">
-                        <i class="<?php echo $is_fav ? 'fa-solid' : 'fa-regular'; ?> fa-heart"></i>
-                    </button>
+               <a class="product-card <?php echo !empty($product['plan_badge']) ? 'boosted-card' : ''; ?>" 
+   href="product.php?id=<?php echo $product['id']; ?>">
 
-                    <div class="product-content">
-                        <div class="price">&#8377; <?php echo number_format($product['price']); ?></div>
-                        <div class="title"><?php echo htmlspecialchars($product['title']); ?></div>
-                        <div class="location">
-                            <i class="fa-solid fa-location-dot"></i>
-                            <?php echo htmlspecialchars($product['city']); ?>
-                        </div>
-                        <div class="product-time" data-timestamp="<?php echo $product['created_at']; ?>">
-                            <i class="fa-regular fa-clock"></i>
-                            <span class="time-text">Loading...</span>
-                        </div>
-                    </div>
-                </a>
+    <?php if(!empty($product['plan_badge'])) { ?>
+        <div class="featured-badge">
+            <?php echo htmlspecialchars($product['plan_badge']); ?>
+        </div>
+    <?php } ?>
+
+    <?php $display_image = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png'; ?>
+    
+    <img src="<?php echo htmlspecialchars($display_image); ?>" alt="Product image" loading="lazy">
+    
+    <button class="fav-btn <?php echo $is_fav ? 'is-fav' : ''; ?>"
+            data-product-id="<?php echo intval($product['id']); ?>"
+            title="<?php echo $is_fav ? 'Remove from Favourites' : 'Save to Favourites'; ?>">
+        <i class="<?php echo $is_fav ? 'fa-solid' : 'fa-regular'; ?> fa-heart"></i>
+    </button>
+
+    <div class="product-content">
+        <div class="price">&#8377; <?php echo number_format($product['price']); ?></div>
+
+        <div class="title">
+            <?php echo htmlspecialchars($product['title']); ?>
+        </div>
+
+        <div class="location">
+            <i class="fa-solid fa-location-dot"></i>
+            <?php echo htmlspecialchars($product['city']); ?>
+        </div>
+
+        <div class="product-time" data-timestamp="<?php echo $product['created_at']; ?>">
+            <i class="fa-regular fa-clock"></i>
+            <span class="time-text">Loading...</span>
+        </div>
+    </div>
+</a>
             <?php } ?>
         </div>
     <?php } else { ?>

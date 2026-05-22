@@ -2,38 +2,54 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// This looks for your .env file in the root directory
+// Load .env
 $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
+use Razorpay\Api\Api;
 use Cloudinary\Configuration\Configuration;
+
+// ======================
+// Razorpay Configuration
+// ======================
+
+define('RAZORPAY_KEY_ID', $_ENV['RAZORPAY_KEY_ID']);
+define('RAZORPAY_KEY_SECRET', $_ENV['RAZORPAY_KEY_SECRET']);
+
+$razorpay = new Api(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET);
+
+// ======================
+// Cloudinary Configuration
+// ======================
 
 Configuration::instance([
   'cloud' => [
-    'cloud_name' => $_ENV['CLOUDINARY_CLOUD_NAME'], 
-    'api_key'    => $_ENV['CLOUDINARY_API_KEY'],  
+    'cloud_name' => $_ENV['CLOUDINARY_CLOUD_NAME'],
+    'api_key'    => $_ENV['CLOUDINARY_API_KEY'],
     'api_secret' => $_ENV['CLOUDINARY_API_SECRET']
   ],
   'url' => [
-    'secure' => true // Forces HTTPS
+    'secure' => true
   ]
 ]);
 
-//Detect Protocol (HTTP or HTTPS)
+// ======================
+// BASE URL Configuration
+// ======================
+
+// Detect Protocol
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
 
-//Get the host 
+// Get Host
 $host = $_SERVER['HTTP_HOST'];
 
-//Dynamically find the project folder name
-// __DIR__ points to the 'shared' folder. dirname(__DIR__) points to the project root.
+// Detect Project Folder
 $project_path = str_replace('\\', '/', dirname(__DIR__));
 $doc_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
 
 $folder_name = str_replace($doc_root, '', $project_path);
 
-//Create the universal BASE_URL
+// Final BASE_URL
 define('BASE_URL', $protocol . '://' . $host . $folder_name . '/public/');
-
 
 ?>
