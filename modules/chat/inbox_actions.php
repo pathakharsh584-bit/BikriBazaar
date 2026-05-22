@@ -58,9 +58,7 @@ $result = getLatestUserChats($conn, $current_user);
         }
         a { text-decoration: none; color: inherit; }
 
-        /* ===== NAVBAR CSS REMOVED – styles come from shared/components/navbar.php ===== */
-
-        /* ===== INBOX PAGE STYLES (consistent with other pages) ===== */
+        /* ===== INBOX PAGE STYLES ===== */
         .inbox-container {
             max-width: 800px;
             margin: 2rem auto;
@@ -73,7 +71,7 @@ $result = getLatestUserChats($conn, $current_user);
             box-shadow: 0 2px 11px #93a4e1;
             border: 1px solid var(--border);
             padding: 1.5rem;
-            width: 25em;
+            width: 100%;                 /* Fixed: remove fixed width, use full width */
         }
         .inbox-header {
             margin-bottom: 1.5rem;
@@ -128,11 +126,12 @@ $result = getLatestUserChats($conn, $current_user);
         }
         .chat-info {
             flex: 1;
+            min-width: 0;               /* Fixed: allows flex child to shrink below content size */
         }
         .chat-meta {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-bottom: 0.4rem;
@@ -149,14 +148,19 @@ $result = getLatestUserChats($conn, $current_user);
             padding: 0.2rem 0.7rem;
             border-radius: 30px;
             font-weight: 600;
+            max-width: 150px;           /* Fixed: prevent very long product names from breaking layout */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
         }
         .last-message {
             font-size: 0.85rem;
             color: var(--muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 350px;
+            white-space: normal;        /* Fixed: allow wrapping instead of single line overflow */
+            word-break: break-word;     /* Fixed: break long unbroken strings (e.g., "hhhhh...") */
+            overflow-wrap: break-word;
+            line-height: 1.4;
         }
         .my-prefix {
             color: #94a3b8;
@@ -190,8 +194,7 @@ $result = getLatestUserChats($conn, $current_user);
             .inbox-container { padding: 0 1rem; }
             .chat-item { padding: 0.75rem; }
             .partner-avatar { width: 45px; height: 45px; font-size: 1rem; }
-            .last-message { max-width: 180px; }
-            .chat-meta { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+            .product-tag { max-width: 120px; }
         }
     </style>
 </head>

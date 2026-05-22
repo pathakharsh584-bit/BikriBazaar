@@ -103,6 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             --muted:        #6b7280;
             --border:       #e2e8f0;
             --surface:      #eef2ff;
+            --grad: linear-gradient(135deg, #1a3fc4 0%, #0ea5a0 100%);
         }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -139,7 +140,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             background: #fff;
             border-radius: 18px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 24px rgba(26,63,196,0.09);
+            box-shadow: 0 4px 24px #6b7280;
             overflow: hidden;
         }
 
@@ -194,7 +195,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         .inp input {
             width: 100%;
             padding: 11px 11px 11px 33px;
-            border: 1.5px solid var(--border);
+            border: 1.5px solid #a1aebf;
             border-radius: 9px;
             font-size: 0.9rem; font-family: inherit;
             color: var(--text); background: #f8faff;
@@ -207,23 +208,34 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             box-shadow: 0 0 0 3px rgba(26,63,196,0.08);
         }
 
-        /* submit */
-        .submit-btn {
-            width: 100%; padding: 12px;
-            border: none; border-radius: 9px;
-            background: var(--primary); color: #fff;
-            font-weight: 700; font-size: 0.93rem; cursor: pointer;
-            display: flex; align-items: center;
-            justify-content: center; gap: 0.5rem;
-            transition: background 0.18s, transform 0.14s;
-            margin-top: 0.2rem;
+        /* === NEW GRADIENT BUTTON === */
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            background: var(--grad);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
         }
-        .submit-btn:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
-        .submit-btn:disabled {
-            background: #93a8e8; cursor: not-allowed; transform: none;
+        .auth-btn:hover:not(:disabled) {
+            opacity: 0.92;
+            transform: translateY(-2px);
+        }
+        .auth-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
-        /* spinner */
+        /* spinner inside button */
         .spinner {
             width: 15px; height: 15px; border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.4);
@@ -267,7 +279,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <i class="fa-solid fa-lock"></i>
         </div>
         <h1>Forgot Password?</h1>
-        <p>Enter your email and let’s get you connected again..</p>
+        <p>Enter your email and let’s get you connected again.</p>
     </div>
 
     <div class="card-body">
@@ -299,10 +311,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <input type="email" id="email" name="email"
                            placeholder="you@example.com" required>
                 </div>
-                
             </div>
 
-            <button type="submit" class="submit-btn" id="submitBtn">
+            <!-- NEW GRADIENT BUTTON -->
+            <button type="submit" class="auth-btn" id="submitBtn">
                 <div class="spinner" id="spinner"></div>
                 <i class="fa-solid fa-paper-plane" id="btn-icon"></i>
                 <span id="btn-text">Send OTP</span>

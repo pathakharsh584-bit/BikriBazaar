@@ -35,14 +35,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a3fc4 0%, #0ea5a0 100%);
+            background: #ffffff; /* changed from gradient to white */
             color: var(--text);
             min-height: 100vh;
         }
 
         a { text-decoration: none; color: inherit; }
 
-        /* ===== NAVBAR CSS REMOVED – styles come from shared/components/navbar.php ===== */
+       
 
         .page-wrap {
             max-width: 690px;
@@ -50,10 +50,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
             padding: 2rem;
             background: #ffffff;
             border-radius: 24px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(26,63,196,0.2);
-            max-height: 91vh;
-            overflow-y: auto;
+            box-shadow: 0 4px 9px #797791;
+             border: 1px solid #9a9aaf;
+
         }
 
         .page-title {
@@ -125,7 +124,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         .upload-zone p { font-size: 0.85rem; color: var(--muted); }
         .upload-zone span { color: var(--primary); font-weight: 600; }
 
-        /* Preview Gallery */
         #preview-wrap {
             display: none; 
             margin-top: 1rem;

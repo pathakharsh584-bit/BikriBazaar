@@ -243,7 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: var(--text); margin-bottom: 0.45rem;
         }
         .input-wrap {
-            position: relative; display: flex; align-items: center;  border: 1px solid #b6b8c3;
+            position: relative; display: flex; align-items: center;  
         }
         .input-wrap i {
             position: absolute; left: 14px;
@@ -253,7 +253,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .input-wrap input {
             width: 100%;
             padding: 13px 14px 13px 40px;
-            border: 1.5px solid var(--border);
+          border: 1.5px solid #868b95;
             border-radius: 12px;
             outline: none;
             font-size: 0.95rem;
