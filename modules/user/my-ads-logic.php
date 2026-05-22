@@ -82,6 +82,8 @@ $total_ads = count($products);
             background: var(--surface);
             color: var(--text);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;  /* ← FLEX COLUMN FOR STICKY FOOTER */
         }
 
         a { text-decoration: none; color: inherit; }
@@ -95,6 +97,8 @@ $total_ads = count($products);
             padding: 0px 1px;
             border: 1px solid #989fbb; 
             border-radius: 17px;
+            flex: 1;  /* ← PUSHES FOOTER DOWN */
+            width:68vw;
         }
 
         .top-bar {
@@ -309,24 +313,24 @@ $total_ads = count($products);
             color: #6b7280;
             border: 1.5px solid #d1d5db;
             cursor: not-allowed;
-            flex: 2; /* takes up more space since edit is gone */
+            flex: 2;
         }
 
+        /* === EMPTY STATE – centered card === */
         .empty-state {
             text-align: center;
             background: #fff;
             padding: 2rem 1.5rem;
-            border-radius: 16px;
-            border: 1px dashed cyan;
-            box-shadow: 0 2px 12px rgba(26, 63, 196, 0.05);
-            width: 30em;
-            position: relative;
-            left: 18em;
-            bottom: 22px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            max-width: 450px;
+            width: 90%;
+            margin: 2rem auto;
         }
         .empty-icon {
-            width: 64px;
-            height: 64px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background: #eef2ff;
             margin: 0 auto 1rem;
@@ -334,27 +338,38 @@ $total_ads = count($products);
             align-items: center;
             justify-content: center;
         }
-        .empty-icon i { font-size: 1.5rem; color: var(--primary); }
-        .empty-state h3 { font-size: 1.1rem; font-weight: 800; color: var(--text); }
-        .empty-state p { font-size: 0.85rem; color: var(--muted); margin-top: 0.35rem; }
+        .empty-icon i { font-size: 1.8rem; color: var(--primary); }
+        .empty-state h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
         .empty-state a {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            margin-top: 1.2rem;
+            gap: 0.5rem;
             background: var(--grad);
             color: #fff;
             padding: 0.6rem 1.4rem;
-            border-radius: 8px;
+            border-radius: 40px;
             font-weight: 700;
-            font-size: 0.88rem;
-            transition: opacity 0.2s, transform 0.15s;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
-        .empty-state a:hover { opacity: 0.9; transform: translateY(-1px); }
+        .empty-state a:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
 
         @media (max-width: 640px) {
             .ads-grid { grid-template-columns: repeat(2, 1fr); }
-            .empty-state { width: 100%; left: 0; border: none; }
+            .empty-state { width: 95%; margin: 2rem auto; }
         }
         @media (max-width: 420px) {
             .ads-grid { grid-template-columns: 1fr; }
@@ -400,7 +415,6 @@ $total_ads = count($products);
                 
                 <div class="ad-card <?php echo $is_sold ? 'sold-card' : ''; ?>">
                     <div class="ad-img-wrap">
-                        
                         <?php 
                             $displayImage = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png';
                         ?>
@@ -467,6 +481,9 @@ $total_ads = count($products);
         </div>
     <?php endif; ?>
 </div>
+
+<!-- Footer included here – sticks to bottom because body is flex column and .page has flex:1 -->
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 </body>
 </html>

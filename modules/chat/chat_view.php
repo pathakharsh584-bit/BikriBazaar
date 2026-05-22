@@ -1,5 +1,7 @@
 <?php
-// chat_view.php – frontend only, original AJAX logic preserved, improved styling with visible borders
+// chat_view.php – frontend only, original AJAX logic preserved
+// MODIFIED: smart auto-scroll – only scrolls to bottom if user was near bottom,
+// otherwise preserves scroll position to allow reading older messages.
 if (!isset($product_id) || !isset($receiver_id)) {
     die("Invalid chat request.");
 }
@@ -28,7 +30,7 @@ if (!empty($receiver_id)) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Chat with <?php echo $receiver_name ?: 'Seller'; ?> - BikriBazaar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -45,32 +47,36 @@ if (!empty($receiver_id)) {
             --border: #dde4f5;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* CRITICAL: make body a flex column with no page scroll */
         body {
             font-family: 'Segoe UI', sans-serif;
             background: var(--surface);
             color: var(--text);
+            height: 100vh;           /* full viewport height */
+            overflow: hidden;        /* no global scrollbar – only chat messages scroll */
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
         a { text-decoration: none; color: inherit; }
 
-        /* ===== CHAT PAGE STYLES ===== */
+        /* ===== CHAT PAGE STYLES - FULLY STATIC BOX, ONLY MESSAGES SCROLL ===== */
         .chat-wrapper {
+            flex: 1;                 /* take all remaining vertical space */
+            min-height: 0;           /* flex overflow fix */
+            width: 100%;
             max-width: 1000px;
-            margin: 1.5rem auto;
-            padding: 0 1rem;
-            flex: 1;
+            margin: 0 auto;
+            padding: 0.75rem 1rem;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 90px);
-            width:28em;
+            gap: 0.75rem;
         }
+        
         .chat-header {
             background: var(--card-bg);
             border-radius: 20px;
             padding: 0.75rem 1.2rem;
-            margin-bottom: 1rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #909295;
             display: flex;
@@ -78,6 +84,7 @@ if (!empty($receiver_id)) {
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 0.5rem;
+            flex-shrink: 0;          /* prevent shrinking, keep header visible */
         }
         .chat-header h2 {
             font-size: 1.2rem;
@@ -92,19 +99,29 @@ if (!empty($receiver_id)) {
             color: var(--primary);
             border: 1px solid #cbd5e1;
         }
+        
+        /* messages container – the ONLY scrollable area, scrollbar hidden */
         .messages-container {
-            flex: 1;
+            flex: 1;                 /* takes all free space between header and input */
+            min-height: 0;           /* essential for flex child overflow */
             background: var(--card-bg);
             border-radius: 24px;
             border: 1px solid #909295;
-            overflow-y: auto;
+            overflow-y: auto;        /* vertical scroll only here */
             padding: 1rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            margin-bottom: 1rem;
             box-shadow: 0 14px 40px #a4afd5;
+            /* Hide scrollbar but keep functionality */
+            scrollbar-width: none;   /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
         }
+        /* Chrome/Safari/Edge: hide scrollbar */
+        .messages-container::-webkit-scrollbar {
+            display: none;
+        }
+        
         /* Message bubbles */
         .message-wrapper {
             display: flex;
@@ -132,11 +149,9 @@ if (!empty($receiver_id)) {
             border-bottom-right-radius: 4px;
         }
         .other-message {
-            background: #f8fafc;
-            color: var(--text);
-            border: 1.5px solid #94a3b8;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+           background: var(--grad);
+            color: white;
+            border-bottom-right-radius: 4px;
         }
         .message-meta {
             font-size: 0.7rem;
@@ -144,7 +159,8 @@ if (!empty($receiver_id)) {
             margin-top: 0.2rem;
             margin-left: 0.5rem;
         }
-        /* Input area */
+        
+        /* Input area – permanently fixed at bottom of chat box */
         .input-area {
             background: var(--card-bg);
             border-radius: 60px;
@@ -153,6 +169,7 @@ if (!empty($receiver_id)) {
             align-items: center;
             padding: 0.3rem 0.3rem 0.3rem 1.2rem;
             gap: 0.5rem;
+            flex-shrink: 0;          /* never shrink, always visible */
         }
         .input-area input {
             flex: 1;
@@ -184,9 +201,22 @@ if (!empty($receiver_id)) {
             padding: 2rem;
             color: var(--muted);
         }
+        
+        /* footer styling – also part of sticky layout but doesn't scroll */
+        footer {
+            flex-shrink: 0;
+            background: var(--surface);
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--muted);
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        
         @media (max-width: 640px) {
-            .chat-wrapper { height: calc(100vh - 70px); }
+            .chat-wrapper { padding: 0.5rem 0.75rem; }
             .message-wrapper { max-width: 85%; }
+            .chat-header h2 { font-size: 1rem; }
         }
     </style>
 </head>
@@ -217,6 +247,8 @@ if (!empty($receiver_id)) {
     </div>
 </div>
 
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
+
 <script>
     const productId = <?php echo json_encode($product_id); ?>;
     const receiverId = <?php echo json_encode($receiver_id); ?>;
@@ -226,13 +258,31 @@ if (!empty($receiver_id)) {
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
 
+    // Helper to scroll to bottom if user is near bottom
+    function autoScrollIfNearBottom() {
+        // If user is within 50px of bottom, scroll to bottom
+        const distanceToBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
+        if (distanceToBottom < 50) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
+
     function fetchMessages() {
         fetch(`${apiUrl}?action=fetch&product_id=${productId}&other_user_id=${receiverId}`)
             .then(response => response.text())
             .then(html => {
+                // Store old scroll state
+                const wasNearBottom = (messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight) < 50;
+                
                 if (messagesContainer.innerHTML !== html) {
                     messagesContainer.innerHTML = html;
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    // Only auto-scroll if user was near bottom before update
+                    if (wasNearBottom) {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                } else {
+                    // Even if HTML unchanged, still check auto-scroll (e.g., after resize)
+                    autoScrollIfNearBottom();
                 }
             })
             .catch(err => console.error('Fetch error:', err));
@@ -254,6 +304,8 @@ if (!empty($receiver_id)) {
         })
         .then(() => {
             messageInput.value = '';
+            // After sending, always scroll to bottom (user expects to see their new message)
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
             fetchMessages();
         })
         .catch(err => console.error('Send error:', err));
@@ -267,8 +319,11 @@ if (!empty($receiver_id)) {
         }
     });
 
-    setInterval(fetchMessages, 2000);
+    // Initial load: scroll to bottom
     fetchMessages();
+
+    // Poll for new messages every 2 seconds
+    setInterval(fetchMessages, 2000);
 </script>
 
 </body>

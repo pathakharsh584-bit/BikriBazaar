@@ -66,6 +66,8 @@ $total_favorites = mysqli_num_rows($result);
             background: var(--surface);
             color: var(--text);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         a { text-decoration: none; color: inherit; }
@@ -79,6 +81,8 @@ $total_favorites = mysqli_num_rows($result);
             padding: 11px 3.5rem;
             border: 1px solid #fff;
             border-radius: 9px;
+            flex: 1; 
+            width:68vw;
         }
 
         .page-header {
@@ -154,17 +158,21 @@ $total_favorites = mysqli_num_rows($result);
             color: var(--teal);
         }
 
+        /* EMPTY STATE – centered card */
         .empty-state {
             text-align: center;
-            padding: 4rem 1.5rem;
             background: #fff;
+            padding: 2.5rem 2rem;
             border-radius: 24px;
             border: 1px solid var(--border);
-            box-shadow: 0 2px 12px rgba(26,63,196,0.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            max-width: 450px;
+            width: 90%;
+            margin: 2rem auto;
         }
         .empty-icon {
-            width: 64px;
-            height: 64px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background: #eef2ff;
             margin: 0 auto 1rem;
@@ -172,39 +180,40 @@ $total_favorites = mysqli_num_rows($result);
             align-items: center;
             justify-content: center;
         }
-        .empty-icon i { font-size: 1.5rem; color: var(--primary); }
+        .empty-icon i { font-size: 1.8rem; color: var(--primary); }
         .empty-state h3 {
             font-size: 1.2rem;
             font-weight: 800;
             color: var(--text);
+            margin-bottom: 0.5rem;
         }
         .empty-state p {
             font-size: 0.85rem;
             color: var(--muted);
-            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
         }
         .empty-state a {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            margin-top: 1.2rem;
+            gap: 0.5rem;
             background: var(--grad);
             color: #fff;
             padding: 0.6rem 1.4rem;
-            border-radius: 30px;
+            border-radius: 40px;
             font-weight: 700;
-            font-size: 0.88rem;
-            transition: opacity 0.2s, transform 0.15s;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
         .empty-state a:hover {
             opacity: 0.9;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         /* RESPONSIVE */
         @media (max-width: 640px) {
-            .container { padding: 0 1rem; }
+            .container { padding: 0 1rem; margin: 1rem auto; }
             .products-grid { grid-template-columns: 1fr; }
+            .empty-state { width: 95%; padding: 1.5rem; }
         }
     </style>
 </head>
@@ -222,14 +231,12 @@ $total_favorites = mysqli_num_rows($result);
         <div class="products-grid">
             <?php while($product = mysqli_fetch_assoc($result)): ?>
                 <a class="product-card" href="product.php?id=<?php echo $product['id']; ?>">
-                    
                     <?php 
                         $displayImage = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png';
                     ?>
                     <img class="product-image"
                          src="<?php echo htmlspecialchars($displayImage); ?>"
                          alt="<?php echo htmlspecialchars($product['title']); ?>">
-                         
                     <div class="product-content">
                         <div class="price">₹ <?php echo number_format($product['price']); ?></div>
                         <div class="title"><?php echo htmlspecialchars($product['title']); ?></div>
@@ -252,6 +259,9 @@ $total_favorites = mysqli_num_rows($result);
         </div>
     <?php endif; ?>
 </div>
+
+<!-- Footer included here -->
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 </body>
 </html>

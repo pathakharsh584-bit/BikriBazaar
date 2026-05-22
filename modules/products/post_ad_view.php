@@ -304,6 +304,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         </button>
     </form>
 </div>
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 <script>
     const dt = new DataTransfer();

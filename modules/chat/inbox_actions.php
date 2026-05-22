@@ -30,7 +30,7 @@ $result = getLatestUserChats($conn, $current_user);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Inbox - BikriBazaar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -48,36 +48,45 @@ $result = getLatestUserChats($conn, $current_user);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Make body full viewport with no global scroll */
         body {
             font-family: 'Segoe UI', sans-serif;
             background: var(--surface);
             color: var(--text);
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
         a { text-decoration: none; color: inherit; }
 
-        /* ===== INBOX PAGE STYLES ===== */
+        /* ===== INBOX PAGE – STATIC LAYOUT, ONLY CHAT LIST SCROLLS ===== */
         .inbox-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
             flex: 1;
+            min-height: 0;          /* critical for flex child scrolling */
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
         }
         .inbox-card {
             background: var(--card-bg);
             border-radius: 24px;
             box-shadow: 0 2px 11px #93a4e1;
             border: 1px solid var(--border);
-            padding: 1.5rem;
-            width: 100%;                 /* Fixed: remove fixed width, use full width */
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
         }
         .inbox-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
             border-bottom: 2px solid var(--teal);
-            display: inline-block;
+            flex-shrink: 0;
         }
         .inbox-header h2 {
             font-size: 1.5rem;
@@ -87,11 +96,22 @@ $result = getLatestUserChats($conn, $current_user);
             align-items: center;
             gap: 0.5rem;
         }
+        
+        /* Scrollable chat list with hidden scrollbar */
         .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
+            scrollbar-width: none;      /* Firefox */
+            -ms-overflow-style: none;   /* IE/Edge */
         }
+        .chat-list::-webkit-scrollbar {
+            display: none;              /* Chrome/Safari */
+        }
+        
         .chat-item {
             display: flex;
             align-items: center;
@@ -126,7 +146,7 @@ $result = getLatestUserChats($conn, $current_user);
         }
         .chat-info {
             flex: 1;
-            min-width: 0;               /* Fixed: allows flex child to shrink below content size */
+            min-width: 0;
         }
         .chat-meta {
             display: flex;
@@ -148,7 +168,7 @@ $result = getLatestUserChats($conn, $current_user);
             padding: 0.2rem 0.7rem;
             border-radius: 30px;
             font-weight: 600;
-            max-width: 150px;           /* Fixed: prevent very long product names from breaking layout */
+            max-width: 150px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -157,8 +177,8 @@ $result = getLatestUserChats($conn, $current_user);
         .last-message {
             font-size: 0.85rem;
             color: var(--muted);
-            white-space: normal;        /* Fixed: allow wrapping instead of single line overflow */
-            word-break: break-word;     /* Fixed: break long unbroken strings (e.g., "hhhhh...") */
+            white-space: normal;
+            word-break: break-word;
             overflow-wrap: break-word;
             line-height: 1.4;
         }
@@ -190,8 +210,22 @@ $result = getLatestUserChats($conn, $current_user);
             font-weight: 700;
             color: var(--text);
         }
+        
+        /* Footer remains sticky */
+        footer {
+            flex-shrink: 0;
+            background: var(--surface);
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--muted);
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        
         @media (max-width: 640px) {
-            .inbox-container { padding: 0 1rem; }
+            .inbox-container { padding: 0.75rem; }
+            .inbox-header { padding: 1rem 1rem 0.5rem 1rem; }
+            .chat-list { padding: 0.75rem; }
             .chat-item { padding: 0.75rem; }
             .partner-avatar { width: 45px; height: 45px; font-size: 1rem; }
             .product-tag { max-width: 120px; }
@@ -242,6 +276,8 @@ $result = getLatestUserChats($conn, $current_user);
     </div>
 </div>
 
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
+
 <script>
     const inboxContainer = document.getElementById('inbox-list-container');
 
@@ -286,6 +322,7 @@ $result = getLatestUserChats($conn, $current_user);
                             </a>`;
                     });
                     inboxContainer.innerHTML = htmlBuilder;
+                    // Keep scroll position stable (no auto-jump)
                 }
             })
             .catch(error => console.error('Error fetching inbox updates:', error));

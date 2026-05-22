@@ -466,6 +466,7 @@ $hide_register = true;
         </div>
     </div>
 </div>
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 <script>
 document.getElementById('registerForm').addEventListener('submit', function(e) {

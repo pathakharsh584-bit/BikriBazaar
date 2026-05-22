@@ -354,6 +354,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+    
 
 
 <?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
@@ -452,6 +453,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
 </div>
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 <script>
     function togglePwd(btn) {

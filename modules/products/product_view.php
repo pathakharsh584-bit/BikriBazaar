@@ -526,7 +526,10 @@ $related_result = mysqli_query($conn, $related_sql);
     </div>
     <?php endif; ?>
 
-</div> <script>
+</div>
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
+
+ <script>
     function changeMainImage(thumbElement, newSrc) {
         document.getElementById('mainImage').src = newSrc;
         document.querySelectorAll('.thumb-img').forEach(thumb => thumb.classList.remove('active'));
