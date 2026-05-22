@@ -12,15 +12,16 @@ function postProduct($conn)
     $title       = mysqli_real_escape_string($conn, trim($_POST['title']));
     $description = mysqli_real_escape_string($conn, trim($_POST['description']));
     $location    = mysqli_real_escape_string($conn, trim($_POST['location']));
+    $city        = mysqli_real_escape_string($conn, trim($_POST['city']));
     $category    = mysqli_real_escape_string($conn, trim($_POST['category']));
     $condition   = mysqli_real_escape_string($conn, trim($_POST['condition']));
     $price       = floatval($_POST['price']);
 
     // STEP 1: Insert the core product data first
     $sql = "INSERT INTO products 
-            (user_id, title, description, price, location, `condition`, category) 
+            (user_id, title, description, price, city, location, `condition`, category) 
             VALUES 
-            ($user_id, '$title', '$description', $price, '$location', '$condition', '$category')";
+            ($user_id, '$title', '$description', $price, '$city', '$location', '$condition', '$category')";
 
     if(mysqli_query($conn, $sql)){
         

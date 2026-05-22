@@ -58,6 +58,21 @@ if(isset($_SESSION['user_id'])){
         $is_favorited = true;
     }
 }
+
+$current_category = mysqli_real_escape_string($conn, $product['category']);
+
+// Fetch related ads (same category, active status, exclude current product)
+$related_sql = "
+    SELECT p.*, 
+    (SELECT image_path FROM product_images WHERE product_id = p.id ORDER BY id ASC LIMIT 1) as image 
+    FROM products p 
+    WHERE p.category = '$current_category' 
+    AND p.id != $product_id 
+    AND p.status = 'active' 
+    ORDER BY RAND() 
+    LIMIT 4"; // Show 4 random related ads
+
+$related_result = mysqli_query($conn, $related_sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -90,8 +105,6 @@ if(isset($_SESSION['user_id'])){
             min-height: 100vh;
         }
         a { text-decoration: none; color: inherit; }
-
-        /* ===== NAVBAR CSS REMOVED – styles come from shared/components/navbar.php ===== */
 
         /* PAGE LAYOUT */
         .product-container {
@@ -297,6 +310,74 @@ if(isset($_SESSION['user_id'])){
             cursor: not-allowed;
         }
 
+        /* RELATED ADS SECTION */
+        .related-section {
+            grid-column: 1 / -1; 
+            margin-top: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+        .related-section h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+        .related-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+        .related-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(26,63,196,0.12);
+            border-color: var(--teal);
+        }
+        .related-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+        }
+        .related-content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .related-price {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .related-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #444;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .related-loc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 850px) {
             .product-container {
@@ -310,11 +391,9 @@ if(isset($_SESSION['user_id'])){
 </head>
 <body>
 
-<!-- SHARED NAVBAR (provides its own CSS and markup) -->
 <?php include __DIR__ . '/../../shared/components/navbar.php'; ?>
 
 <div class="product-container">
-    <!-- LEFT COLUMN -->
     <div class="left-col">
         <div class="gallery-card">
             <div class="main-image-wrap">
@@ -347,7 +426,6 @@ if(isset($_SESSION['user_id'])){
         </div>
     </div>
 
-    <!-- RIGHT COLUMN -->
     <div class="right-col">
         <div class="sidebar-card">
             <div class="price">₹ <?php echo number_format($product['price']); ?></div>
@@ -385,10 +463,70 @@ if(isset($_SESSION['user_id'])){
                 </a>
             <?php endif; ?>
         </div>
-    </div>
-</div>
 
-<script>
+        <?php 
+        if (!empty($product['location']) && !empty($product['city'])): 
+            $full_address = $product['location'] . ", " . $product['city'] . ", India";
+            $map_query = urlencode($full_address); 
+        ?>
+        <div class="sidebar-card">
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-map-location-dot" style="color: var(--primary);"></i> Location Map
+            </h3>
+            
+            <iframe 
+                width="100%" 
+                height="220" 
+                style="border: 1px solid var(--border); border-radius: 12px; display: block;" 
+                src="https://maps.google.com/maps?q=<?php echo $map_query; ?>&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                allowfullscreen="" 
+                loading="lazy">
+            </iframe>
+            
+            <div style="margin-top: 1.2rem; font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 0.6rem;">
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <i class="fa-solid fa-building" style="color: var(--teal); margin-top: 3px; width: 14px; text-align: center;"></i>
+                    <div>
+                        <strong style="color: var(--text);">City:</strong> 
+                        <?php echo htmlspecialchars($product['city']); ?>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <i class="fa-solid fa-map-pin" style="color: var(--teal); margin-top: 3px; width: 14px; text-align: center;"></i>
+                    <div>
+                        <strong style="color: var(--text);">Address:</strong> 
+                        <?php echo htmlspecialchars($product['location']); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div> <?php if ($related_result && mysqli_num_rows($related_result) > 0): ?>
+    <div class="related-section">
+        <h3>Related Ads</h3>
+        <div class="related-grid">
+            <?php while($rel_ad = mysqli_fetch_assoc($related_result)): ?>
+                <?php $rel_image = !empty($rel_ad['image']) ? $rel_ad['image'] : BASE_URL . 'assets/images/default-placeholder.png'; ?>
+                
+                <a href="product.php?id=<?php echo $rel_ad['id']; ?>" class="related-card">
+                    <img src="<?php echo htmlspecialchars($rel_image); ?>" alt="<?php echo htmlspecialchars($rel_ad['title']); ?>" loading="lazy">
+                    <div class="related-content">
+                        <div class="related-price">₹ <?php echo number_format($rel_ad['price']); ?></div>
+                        <div class="related-title" title="<?php echo htmlspecialchars($rel_ad['title']); ?>">
+                            <?php echo htmlspecialchars($rel_ad['title']); ?>
+                        </div>
+                        <div class="related-loc">
+                            <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i>
+                            <?php echo htmlspecialchars($rel_ad['city'] ?? $rel_ad['location']); ?>
+                        </div>
+                    </div>
+                </a>
+            <?php endwhile; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+</div> <script>
     function changeMainImage(thumbElement, newSrc) {
         document.getElementById('mainImage').src = newSrc;
         document.querySelectorAll('.thumb-img').forEach(thumb => thumb.classList.remove('active'));

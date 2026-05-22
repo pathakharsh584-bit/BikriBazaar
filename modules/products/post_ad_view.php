@@ -260,11 +260,11 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 
         <div class="form-row">
             <div class="form-group">
-                <label for="location"><i class="fa-solid fa-location-dot"></i> Location</label>
+                <label for="city"><i class="fa-solid fa-city"></i> City</label>
                 <div class="input-wrap">
-                    <input type="text" id="location" name="location" placeholder="City, Area (e.g. Mumbai, Andheri)" required>
+                    <input type="text" id="city" name="city" placeholder="e.g. Jamshedpur, Ranchi" required>
                 </div>
-            </div>
+            </div>            
             <div class="form-group">
                 <label for="condition"><i class="fa-solid fa-certificate"></i> Condition</label>
                 <div class="input-wrap">
@@ -276,6 +276,16 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
                     </select>
                 </div>
             </div>
+        </div>
+
+        <div class="form-group">
+            <label for="location"><i class="fa-solid fa-map-pin"></i> Specific Address</label>
+            <div class="input-wrap">
+                <input type="text" id="location" name="location" placeholder="e.g. Flat No. 10, Golmuri Road" required>
+            </div>
+            <small style="color: #6b7280; font-size: 0.8rem; margin-top: 5px; display: block; padding-left: 5px;">
+                Provide a specific street or landmark so buyers can find the item on the map.
+            </small>
         </div>
 
         <hr class="form-divider">
