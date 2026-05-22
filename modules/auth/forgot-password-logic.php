@@ -31,14 +31,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         try {
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
+            $mail->Host = $_ENV['SMTP_HOST'];
             $mail->SMTPAuth = true;
-            $mail->Username = 'bikribazaar.project@gmail.com';
-            $mail->Password = 'qqbh jsiz rebf akrl';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
+            $mail->Username = $_ENV['SMTP_USERNAME'];
+            $mail->Password = $_ENV['SMTP_PASSWORD'];
+            $encryption = $_ENV['SMTP_SECURE'];
 
-            $mail->setFrom('bikribazaar.project@gmail.com', 'BikriBazaar');
+            if ($encryption === 'tls') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            } elseif ($encryption === 'ssl') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } else {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_NONE;
+            }    
+
+            $mail->Port = $_ENV['SMTP_PORT'];
+
+            $mail->setFrom($_ENV['SMTP_USERNAME'], 'BikriBazaar');
             $mail->addAddress($email);
             $mail->isHTML(true);
 
