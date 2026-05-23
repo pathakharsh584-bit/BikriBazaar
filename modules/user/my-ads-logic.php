@@ -97,7 +97,8 @@ $total_ads = count($products);
             padding: 0px 1px;
             border: 1px solid #989fbb;
             border-radius: 17px;
-            flex: 1;               /* pushes footer down */
+            flex: 1;             
+            width:50vw;
         }
 
         .top-bar {

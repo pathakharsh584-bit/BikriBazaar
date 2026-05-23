@@ -94,7 +94,7 @@ $total_favorites = mysqli_num_rows($result);
             color: #072fbd;
         }
         .page-header p {
-            color: var(--muted);
+            color: #0d1016;;
             margin-top: 0.25rem;
         }
 
