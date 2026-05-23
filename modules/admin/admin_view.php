@@ -1,5 +1,11 @@
 <?php
+session_start();
 
+if (!isset($_SESSION['is_admin'])) {
+
+    header("Location: admin_login.php");
+    exit();
+}
 // ======================================
 // ADMIN PANEL - DASHBOARD PLANNING
 // ======================================
@@ -133,26 +139,31 @@ $recentProducts = mysqli_query(
         products.price,
         products.category,
         products.location,
-        products.image,
         products.created_at,
 
-        users.name AS seller_name
+        users.name AS seller_name,
+
+        MIN(product_images.image_path) AS image
 
      FROM products
 
      JOIN users 
      ON products.user_id = users.id
 
+     LEFT JOIN product_images
+     ON products.id = product_images.product_id
+
+     GROUP BY products.id
+
      ORDER BY products.created_at DESC
 
      LIMIT 5"
-);  
+);
      // ======================================
 // STEP 7: FAVORITE PRODUCTS ANALYTICS
 // Goal:
 // Show which products are most favorited.
 // ======================================
-
 $favoriteProducts = mysqli_query(
 
     $conn,
@@ -160,9 +171,12 @@ $favoriteProducts = mysqli_query(
     "SELECT 
         products.id,
         products.title,
-        products.image,
+
         users.name AS seller_name,
-        COUNT(favorites.id) AS total_favorites
+
+        COUNT(favorites.id) AS total_favorites,
+
+        MIN(product_images.image_path) AS image
 
      FROM favorites
 
@@ -172,13 +186,15 @@ $favoriteProducts = mysqli_query(
      JOIN users
      ON products.user_id = users.id
 
+     LEFT JOIN product_images
+     ON products.id = product_images.product_id
+
      GROUP BY products.id
 
      ORDER BY total_favorites DESC
 
      LIMIT 10"
 );
-
 ?>
 
 <!DOCTYPE html>
@@ -305,50 +321,121 @@ $favoriteProducts = mysqli_query(
 
 <body>
 
-<div class="dashboard-header">
-    <h1>Admin Dashboard</h1>
-    <p>Manage users, products, and marketplace activity from one place.</p>
+<!-- TOP HEADER -->
+
+<div style="
+    width:100%;
+    background:linear-gradient(135deg,#1a3fc4,#0ea5a0);
+    padding:18px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+">
+
+    <div style="
+        font-size:30px;
+        font-weight:800;
+        color:white;
+        letter-spacing:1px;
+    ">
+        BIKRI<span style="color:#d1fae5;">BAZAAR</span>
+    </div>
+
+    <a href="logout.php"
+       style="
+            background:white;
+            color:#111827;
+            padding:12px 18px;
+            border-radius:12px;
+            text-decoration:none;
+            font-weight:700;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+       ">
+
+        Logout
+
+    </a>
+
 </div>
+
+<div style="padding:30px;">
+
+<!-- DASHBOARD HEADER -->
+
+<div class="dashboard-header">
+
+    <h1 style="
+        font-size:42px;
+        margin-bottom:10px;
+    ">
+        Admin Dashboard
+    </h1>
+
+    <p style="
+        font-size:16px;
+    ">
+        Manage users, products, favorites and marketplace activity easily.
+    </p>
+
+</div>
+
+<!-- CARDS -->
 
 <div class="admin-cards">
 
     <div class="admin-card">
+
         <h3>Total Users</h3>
+
         <p><?php echo $totalUsers; ?></p>
+
     </div>
 
     <div class="admin-card">
+
         <h3>Total Products</h3>
+
         <p><?php echo $totalProducts; ?></p>
+
     </div>
 
     <div class="admin-card">
 
-    <h3>Favorite Analytics</h3>
+        <h3>Favorite Analytics</h3>
 
-    <p><?php echo $totalFavorites; ?></p>
+        <p><?php echo $totalFavorites; ?></p>
 
-    <a href="#favorites-section"
-       style="
-            display:inline-block;
-            margin-top:10px;
-            background:#2563eb;
-            color:white;
-            padding:8px 14px;
-            border-radius:8px;
-            text-decoration:none;
-       ">
-        View Details
-    </a>
+        <a href="#favorites-section"
+           style="
+                display:inline-block;
+                margin-top:12px;
+                background:#2563eb;
+                color:white;
+                padding:10px 16px;
+                border-radius:10px;
+                text-decoration:none;
+                font-weight:600;
+           ">
+
+            View Details
+
+        </a>
+
+    </div>
 
 </div>
-</div>
+
+<!-- RECENT USERS -->
 
 <div class="section-box">
+
     <h2>Recent Users</h2>
 
-    <table border="1" width="100%">
+    <table>
+
         <tr class="users-header">
+
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
@@ -356,33 +443,55 @@ $favoriteProducts = mysqli_query(
             <th>City</th>
             <th>Joined</th>
             <th>Action</th>
+
         </tr>
 
         <?php while($user = mysqli_fetch_assoc($recentUsers)) { ?>
+
             <tr>
+
                 <td><?php echo $user['id']; ?></td>
+
                 <td><?php echo $user['name']; ?></td>
+
                 <td><?php echo $user['email']; ?></td>
+
                 <td><?php echo $user['phone']; ?></td>
+
                 <td><?php echo $user['city']; ?></td>
+
                 <td><?php echo $user['created_at']; ?></td>
+
                 <td>
+
                     <a class="delete-btn"
                        href="admin_view.php?delete_user=<?php echo $user['id']; ?>"
-                       onclick="return confirm('Are you sure you want to delete this user?');">
+                       onclick="return confirm('Delete this user?');">
+
                         Delete
+
                     </a>
+
                 </td>
+
             </tr>
+
         <?php } ?>
+
     </table>
+
 </div>
 
+<!-- RECENT PRODUCTS -->
+
 <div class="section-box">
+
     <h2>Recent Products</h2>
 
-    <table border="1" width="100%">
+    <table>
+
         <tr class="products-header">
+
             <th>ID</th>
             <th>Image</th>
             <th>Title</th>
@@ -391,46 +500,71 @@ $favoriteProducts = mysqli_query(
             <th>Location</th>
             <th>Seller</th>
             <th>Action</th>
+
         </tr>
 
         <?php while($product = mysqli_fetch_assoc($recentProducts)) { ?>
+
             <tr>
+
                 <td><?php echo $product['id']; ?></td>
 
                 <td>
-                    <img 
-                        src="/BikriBazaar/public/uploads/products/<?php echo rawurlencode($product['image']); ?>"
-                        width="80"
-                        height="80"
-                        style="object-fit:cover;"
-                    >
+
+                    <?php if(!empty($product['image'])) { ?>
+
+                        <img 
+                            src="/BikriBazaar/public/uploads/products/<?php echo rawurlencode($product['image']); ?>"
+                            width="80"
+                            height="80"
+                            style="object-fit:cover;"
+                        >
+
+                    <?php } else { ?>
+
+                        No Image
+
+                    <?php } ?>
+
                 </td>
 
                 <td><?php echo $product['title']; ?></td>
+
                 <td>₹ <?php echo $product['price']; ?></td>
+
                 <td><?php echo $product['category']; ?></td>
+
                 <td><?php echo $product['location']; ?></td>
+
                 <td><?php echo $product['seller_name']; ?></td>
 
                 <td>
+
                     <a class="delete-btn"
                        href="admin_view.php?delete_product=<?php echo $product['id']; ?>"
-                       onclick="return confirm('Are you sure you want to delete this product?');">
+                       onclick="return confirm('Delete this product?');">
+
                         Delete
+
                     </a>
+
                 </td>
+
             </tr>
+
         <?php } ?>
+
     </table>
+
 </div>
 
-<!-- Favorite Products Analytics Section -->
+<!-- FAVORITES -->
 
 <div class="section-box" id="favorites-section">
 
     <h2>Wishlist Products</h2>
 
-    <table border="1" width="100%">
+    <table>
 
         <tr class="products-header">
 
@@ -450,12 +584,20 @@ $favoriteProducts = mysqli_query(
 
                 <td>
 
-                    <img 
-                        src="/BikriBazaar/public/uploads/products/<?php echo rawurlencode($favorite['image']); ?>"
-                        width="80"
-                        height="80"
-                        style="object-fit:cover;"
-                    >
+                    <?php if(!empty($favorite['image'])) { ?>
+
+                        <img 
+                            src="/BikriBazaar/public/uploads/products/<?php echo rawurlencode($favorite['image']); ?>"
+                            width="80"
+                            height="80"
+                            style="object-fit:cover;"
+                        >
+
+                    <?php } else { ?>
+
+                        No Image
+
+                    <?php } ?>
 
                 </td>
 
@@ -464,9 +606,16 @@ $favoriteProducts = mysqli_query(
                 <td><?php echo $favorite['seller_name']; ?></td>
 
                 <td>
-                    <strong style="color:#7c3aed; font-size:18px;">
+
+                    <strong style="
+                        color:#7c3aed;
+                        font-size:18px;
+                    ">
+
                         <?php echo $favorite['total_favorites']; ?>
+
                     </strong>
+
                 </td>
 
             </tr>
@@ -474,6 +623,8 @@ $favoriteProducts = mysqli_query(
         <?php } ?>
 
     </table>
+
+</div>
 
 </div>
 
