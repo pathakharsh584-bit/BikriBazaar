@@ -1,9 +1,11 @@
 <?php
+require_once __DIR__ . '/../../shared/config.php';
+require_once __DIR__ . '/../../shared/db.php';
 session_start();
 
 if (!isset($_SESSION['is_admin'])) {
 
-    header("Location: admin_login.php");
+    header("Location: " . BASE_URL . "public/admin.php");
     exit();
 }
 // ======================================
@@ -38,7 +40,7 @@ if (isset($_GET['delete_product'])) {
 
     mysqli_query($conn, "DELETE FROM products WHERE id = $deleteId");
 
-    header("Location: admin_view.php");
+    header("Location: " . BASE_URL . "admin_view.php");
 
     exit();
 }
@@ -62,7 +64,7 @@ if (isset($_GET['delete_user'])) {
 
     mysqli_query($conn, "DELETE FROM users WHERE id = $deleteUser");
 
-    header("Location: admin_view.php");
+    header("Location: " . BASE_URL . "admin_view.php");
 
     exit();
 }
@@ -557,7 +559,7 @@ tbody tr:hover td{
     ">
 
         <img 
-            src="<?php echo $projectRoot; ?>/public/assets/images/logo.png"
+            src="<?php echo BASE_URL; ?>assets/images/logo.png"
             alt="BikriBazaar Logo"
 
             style="
@@ -586,7 +588,7 @@ tbody tr:hover td{
 
     <!-- LOGOUT BUTTON -->
 
-    <a href="logout.php"
+    <a href="<?php echo BASE_URL; ?>admin_logout.php"
        style="
             background:white;
             color:#111827;
@@ -713,7 +715,7 @@ tbody tr:hover td{
                 <td>
 
                     <a class="delete-btn"
-                       href="admin_view.php?delete_user=<?php echo $user['id']; ?>"
+                       href="<?php echo BASE_URL; ?>admin_view.php?delete_user=<?php echo $user['id']; ?>"
                        onclick="return confirm('Delete this user?');">
 
                         Delete
@@ -789,7 +791,7 @@ tbody tr:hover td{
                 <td>
 
                     <a class="delete-btn"
-                       href="admin_view.php?delete_product=<?php echo $product['id']; ?>"
+                       href="<?php echo BASE_URL; ?>admin_view.php?delete_product=<?php echo $product['id']; ?>"
                        onclick="return confirm('Delete this product?');">
 
                         Delete

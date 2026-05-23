@@ -1,8 +1,11 @@
 <?php
+
+require_once __DIR__ . '/../../shared/config.php';
+
 session_start();
 
 if (!isset($_SESSION['admin_temp_auth'])) {
-    header("Location: admin_login.php");
+    header("Location: " . BASE_URL . "admin.php");
     exit();
 }
 
@@ -91,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['admin_temp_auth']);
         unset($_SESSION['admin_otp']);
 
-        header("Location: admin_view.php");
+        header("Location: " . BASE_URL . "admin_view.php");
         exit();
 
     } else {

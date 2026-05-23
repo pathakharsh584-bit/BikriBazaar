@@ -440,7 +440,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         Forgot password?
     </a>
 
-    <a href="/BikriBazaar/modules/admin/admin_login.php"
+    <a href="<?php echo BASE_URL; ?>admin.php"
        style="
             color:#0ea5a0;
             font-weight:700;

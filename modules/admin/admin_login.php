@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/../../shared/config.php';
+
 session_start();
 
 $error = "";
@@ -15,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $_SESSION['admin_temp_auth'] = true;
 
-        header("Location: verify_otp.php");
+        header("Location: " . BASE_URL . "verify_otp.php");
         exit();
 
     } else {
@@ -195,7 +198,7 @@ input:focus{
     </form>
 
     <div class="back">
-        <a href="/BikriBazaar/modules/auth/login_view.php">
+        <a href="<?php echo BASE_URL; ?>login.php">
             ← Back to User Login
         </a>
     </div>
