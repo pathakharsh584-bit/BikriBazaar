@@ -31,7 +31,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $current_time = time();
 
         if($current_time <= $expiry_time){
-            
+            session_start();
+
+$_SESSION['verified_reset_email'] = $email;
             $redirect_url = BASE_URL . "reset-password.php?email=" . urlencode($email);
             
             if ($is_ajax) {

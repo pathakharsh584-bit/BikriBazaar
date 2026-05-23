@@ -203,120 +203,333 @@ $favoriteProducts = mysqli_query(
     <title>Admin Dashboard</title>
 
     <style>
-        body{
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #eef2ff, #f8fafc);
-            padding:30px;
-            color:#111827;
-        }
 
-        .dashboard-header{
-            background:white;
-            padding:25px;
-            border-radius:16px;
-            box-shadow:0 4px 15px rgba(0,0,0,0.08);
-            margin-bottom:25px;
-        }
+:root{
+    --primary:#1a3fc4;
+    --primary-dark:#1530a0;
+    --teal:#0ea5a0;
+    --surface:#f4f7ff;
+    --text:#1a1a2e;
+    --muted:#6b7280;
+    --border:#dde4f5;
+    --grad:linear-gradient(135deg,#1a3fc4 0%,#0ea5a0 100%);
+}
 
-        .dashboard-header h1{
-            margin:0;
-            color:#1e3a8a;
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        .dashboard-header p{
-            color:#6b7280;
-            margin-top:8px;
-        }
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:var(--surface);
+    color:var(--text);
+}
 
-        .admin-cards{
-            display:flex;
-            gap:20px;
-            flex-wrap:wrap;
-            margin-bottom:35px;
-        }
+/* HEADER */
 
-        .admin-card{
-            background:white;
-            padding:25px;
-            width:230px;
-            border-radius:16px;
-            box-shadow:0 4px 15px rgba(0,0,0,0.08);
-            text-align:center;
-            transition:0.3s;
-        }
+.admin-navbar{
+    background:#fff;
+    box-shadow:0 2px 14px rgba(26,63,196,0.10);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 2rem;
+    height:78px;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:100;
+}
 
-        .admin-card:hover{
-            transform:translateY(-6px);
-            box-shadow:0 8px 25px rgba(0,0,0,0.15);
-        }
+.admin-logo{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
 
-        .admin-card h3{
-            color:#374151;
-        }
+.admin-logo img{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid var(--primary);
+    background:#fff;
+}
 
-        .admin-card p{
-            font-size:36px;
-            font-weight:bold;
-            color:#2563eb;
-        }
+.admin-logo h2{
+    font-size:1.8rem;
+    font-weight:800;
+    color:var(--primary);
+}
 
-        .section-box{
-            background:white;
-            padding:25px;
-            border-radius:16px;
-            box-shadow:0 4px 15px rgba(0,0,0,0.08);
-            margin-top:30px;
-            overflow-x:auto;
-        }
+.admin-logo span{
+    color:var(--teal);
+}
 
-        table{
-            margin-top:20px;
-            width:100%;
-            border-collapse:collapse;
-        }
+.admin-nav-right{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
 
-        th{
-            padding:14px;
-            color:white;
-            font-size:15px;
-        }
+.admin-badge{
+    background:#eef2ff;
+    color:var(--primary);
+    padding:10px 16px;
+    border-radius:12px;
+    font-size:0.85rem;
+    font-weight:700;
+}
 
-        td{
-            padding:13px;
-            border-bottom:1px solid #e5e7eb;
-            text-align:center;
-        }
+.logout-btn{
+    background:var(--grad);
+    color:white;
+    padding:11px 18px;
+    border-radius:12px;
+    text-decoration:none;
+    font-weight:700;
+    transition:0.25s;
+    box-shadow:0 4px 12px rgba(26,63,196,0.15);
+}
 
-        tbody tr:hover td{
-            background:#f9fafb;
-        }
+.logout-btn:hover{
+    transform:translateY(-2px);
+    opacity:0.92;
+}
 
-        .users-header{
-            background:#2563eb;
-        }
+/* MAIN WRAPPER */
 
-        .products-header{
-            background:#0f766e;
-        }
+.main-wrapper{
+    padding:30px;
+}
 
-        .delete-btn{
-            background:#dc2626;
-            color:white;
-            padding:8px 14px;
-            border-radius:8px;
-            text-decoration:none;
-            transition:0.3s;
-        }
+/* DASHBOARD HEADER */
 
-        .delete-btn:hover{
-            background:#991b1b;
-        }
+.dashboard-header{
+    background:#fff;
+    padding:32px;
+    border-radius:24px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.06);
+    border:1px solid var(--border);
+    margin-bottom:30px;
+}
 
-        img{
-            border-radius:10px;
-            border:1px solid #e5e7eb;
-        }
-    </style>
+.dashboard-header h1{
+    font-size:2.3rem;
+    color:var(--primary);
+    margin-bottom:8px;
+    font-weight:800;
+}
+
+.dashboard-header p{
+    color:var(--muted);
+    font-size:0.98rem;
+    line-height:1.6;
+}
+
+/* CARDS */
+
+.admin-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:24px;
+    margin-bottom:35px;
+}
+
+.admin-card{
+    background:#fff;
+    padding:28px;
+    border-radius:22px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    border:1px solid #edf2ff;
+    transition:0.3s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+.admin-card::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:5px;
+    background:var(--grad);
+}
+
+.admin-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 18px 40px rgba(0,0,0,0.10);
+}
+
+.admin-card h3{
+    color:var(--muted);
+    font-size:1rem;
+    margin-bottom:16px;
+}
+
+.admin-card p{
+    font-size:2.7rem;
+    font-weight:800;
+    color:var(--primary);
+}
+
+/* SECTION BOX */
+
+.section-box{
+    background:#fff;
+    padding:28px;
+    border-radius:24px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    border:1px solid #edf2ff;
+    margin-top:35px;
+    overflow-x:auto;
+}
+
+.section-box h2{
+    font-size:1.6rem;
+    color:var(--text);
+    margin-bottom:20px;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    padding:16px;
+    color:#fff;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+
+.users-header{
+    background:var(--primary);
+}
+
+.products-header{
+    background:var(--teal);
+}
+
+td{
+    padding:16px;
+    border-bottom:1px solid #eef2ff;
+    text-align:center;
+    font-size:0.92rem;
+    color:#374151;
+}
+
+
+tbody tr{
+    transition:0.25s ease;
+}
+
+tbody tr:hover{
+    background:#0EA1A1;
+    transform:scale(1.003);
+}
+
+tbody tr:hover td{
+    color:white;
+}
+
+/* BUTTONS */
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+    padding:9px 15px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.2s;
+    display:inline-block;
+}
+
+.delete-btn:hover{
+    background:#dc2626;
+    transform:translateY(-1px);
+}
+
+.view-btn{
+    background:var(--grad);
+    color:white;
+    padding:10px 16px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    display:inline-block;
+    margin-top:12px;
+}
+
+/* IMAGES */
+
+.product-image{
+    width:75px;
+    height:75px;
+    border-radius:14px;
+    object-fit:cover;
+    border:2px solid #eef2ff;
+}
+
+/* NO IMAGE */
+
+.no-image{
+    background:#f3f4f6;
+    color:#6b7280;
+    padding:12px;
+    border-radius:10px;
+    font-size:0.8rem;
+    font-weight:600;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+    .admin-navbar{
+        padding:1rem;
+        height:auto;
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .admin-nav-right{
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+    }
+
+    .main-wrapper{
+        padding:18px;
+    }
+
+    .dashboard-header{
+        padding:24px;
+    }
+
+    .dashboard-header h1{
+        font-size:1.8rem;
+    }
+
+    .admin-card p{
+        font-size:2.2rem;
+    }
+
+    th,td{
+        padding:12px;
+        font-size:0.82rem;
+    }
+
+}
+
+</style>
 </head>
 
 <body>
@@ -331,34 +544,69 @@ $favoriteProducts = mysqli_query(
     justify-content:space-between;
     align-items:center;
     box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    flex-wrap:wrap;
+    gap:15px;
 ">
 
+    <!-- LOGO SECTION -->
+
     <div style="
-        font-size:30px;
-        font-weight:800;
-        color:white;
-        letter-spacing:1px;
+        display:flex;
+        align-items:center;
+        gap:15px;
     ">
-        BIKRI<span style="color:#d1fae5;">BAZAAR</span>
+
+        <img 
+            src="<?php echo $projectRoot; ?>/public/assets/images/logo.png"
+            alt="BikriBazaar Logo"
+
+            style="
+                width:58px;
+                height:58px;
+                border-radius:50%;
+                object-fit:cover;
+                background:white;
+                padding:4px;
+                box-shadow:0 4px 12px rgba(0,0,0,0.15);
+            "
+        >
+
+        <div style="
+            font-size:30px;
+            font-weight:800;
+            color:white;
+            letter-spacing:1px;
+        ">
+
+            Bikri<span style="color:#127174;">Bazar</span>
+
+        </div>
+
     </div>
+
+    <!-- LOGOUT BUTTON -->
 
     <a href="logout.php"
        style="
             background:white;
             color:#111827;
-            padding:12px 18px;
+            padding:12px 20px;
             border-radius:12px;
             text-decoration:none;
             font-weight:700;
             box-shadow:0 4px 12px rgba(0,0,0,0.08);
-       ">
+            transition:0.3s;
+       "
+
+       onmouseover="this.style.transform='translateY(-2px)'"
+       onmouseout="this.style.transform='translateY(0px)'"
+    >
 
         Logout
 
     </a>
 
 </div>
-
 <div style="padding:30px;">
 
 <!-- DASHBOARD HEADER -->
@@ -514,7 +762,7 @@ $favoriteProducts = mysqli_query(
                     <?php if(!empty($product['image'])) { ?>
 
                         <img 
-                            src="/BikriBazaar/public/uploads/products/<?php echo rawurlencode($product['image']); ?>"
+                       src="<?php echo htmlspecialchars($product['image']); ?>"
                             width="80"
                             height="80"
                             style="object-fit:cover;"
@@ -587,7 +835,7 @@ $favoriteProducts = mysqli_query(
                     <?php if(!empty($favorite['image'])) { ?>
 
                         <img 
-                            src="/BikriBazaar/public/uploads/products/<?php echo rawurlencode($favorite['image']); ?>"
+                      src="<?php echo htmlspecialchars($favorite['image']); ?>" 
                             width="80"
                             height="80"
                             style="object-fit:cover;"

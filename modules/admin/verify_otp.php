@@ -12,11 +12,72 @@ if (!isset($_SESSION['admin_otp'])) {
 
     $_SESSION['admin_otp'] = rand(100000, 999999);
 
-    /*
-    LATER:
-    SEND OTP TO EMAIL HERE
-    */
+    require_once __DIR__ . '/../../vendor/autoload.php';
 
+    $dotenv = parse_ini_file(__DIR__ . '/../../.env');
+
+    $adminEmail = $dotenv['ADMIN_EMAIL'];
+    $appPassword = $dotenv['ADMIN_APP_PASSWORD'];
+
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+
+        $mail->isSMTP();
+
+        $mail->Host = 'smtp.gmail.com';
+
+        $mail->SMTPAuth = true;
+
+        $mail->Username = $adminEmail;
+
+        $mail->Password = $appPassword;
+
+        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+
+        $mail->Port = 587;
+
+        $mail->setFrom($adminEmail, 'BikriBazaar Admin');
+
+        $mail->addAddress($adminEmail);
+
+        $mail->isHTML(true);
+
+        $mail->Subject = 'BikriBazaar Admin OTP Verification';
+
+        $mail->Body = '
+
+            <div style="
+                font-family:Segoe UI,sans-serif;
+                padding:20px;
+            ">
+
+                <h2 style="color:#1a3fc4;">
+                    BikriBazaar Admin Verification
+                </h2>
+
+                <p>Your OTP is:</p>
+
+                <h1 style="
+                    letter-spacing:4px;
+                    color:#0ea5a0;
+                ">
+                    ' . $_SESSION['admin_otp'] . '
+                </h1>
+
+                <p>
+                    This OTP is valid for this session only.
+                </p>
+
+            </div>
+        ';
+
+        $mail->send();
+
+    } catch (Exception $e) {
+
+        die("OTP Mail Failed: " . $mail->ErrorInfo);
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -178,15 +239,6 @@ input:focus{
     <div class="title">
         <h2>OTP Verification</h2>
         <p>Enter the OTP sent to admin email</p>
-    </div>
-
-    <div class="note">
-
-        TEMP OTP:
-        <strong>
-            <?php echo $_SESSION['admin_otp']; ?>
-        </strong>
-
     </div>
 
     <?php if($error != ""): ?>
