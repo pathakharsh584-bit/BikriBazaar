@@ -91,7 +91,7 @@ $total_favorites = mysqli_num_rows($result);
         .page-header h1 {
             font-size: 1.8rem;
             font-weight: 800;
-            color: var(--text);
+            color: #072fbd;
         }
         .page-header p {
             color: var(--muted);
