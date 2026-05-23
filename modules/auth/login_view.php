@@ -432,9 +432,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
 
-                <div class="forgot-row">
-                    <a href="forgot-password.php">Forgot password?</a>
-                </div>
+                <div class="forgot-row" 
+     style="display:flex; justify-content:space-between; align-items:center;">
+
+    <a href="forgot-password.php">
+        Forgot password?
+    </a>
+
+    <a href="/BikriBazaar/modules/admin/admin_login.php"
+       style="
+            color:#0ea5a0;
+            font-weight:700;
+            font-size:0.82rem;
+            display:flex;
+            align-items:center;
+            gap:6px;
+       ">
+
+        <i class="fa-solid fa-user-shield"></i>
+
+        Login as Administrator
+    </a>
+
+</div>
 
                 <button class="auth-btn" type="submit">
                     <i class="fa-solid fa-right-to-bracket"></i> Sign In

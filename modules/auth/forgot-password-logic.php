@@ -6,6 +6,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/db.php';
 
 $message = "";
@@ -14,7 +15,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $email = trim($_POST['email']);
 
-    $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 
     $check = "SELECT * FROM users WHERE email='$email'";
     $result = mysqli_query($conn, $check);
@@ -22,67 +24,134 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(mysqli_num_rows($result) == 1){
 
         $otp = rand(100000, 999999);
-        $expiry = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
-        $update = "UPDATE users SET otp='$otp', otp_expiry='$expiry' WHERE email='$email'";
+        $expiry = date(
+            'Y-m-d H:i:s',
+            strtotime('+10 minutes')
+        );
+
+        $update = "
+            UPDATE users 
+            SET otp='$otp',
+                otp_expiry='$expiry'
+            WHERE email='$email'
+        ";
+
         mysqli_query($conn, $update);
 
         $mail = new PHPMailer(true);
 
         try {
+
+            // SMTP CONFIGURATION
+
             $mail->isSMTP();
-            $mail->Host = $_ENV['SMTP_HOST'];
+
+            $mail->Host = 'smtp.gmail.com';
+
             $mail->SMTPAuth = true;
-            $mail->Username = $_ENV['SMTP_USERNAME'];
-            $mail->Password = $_ENV['SMTP_PASSWORD'];
-            $encryption = $_ENV['SMTP_SECURE'];
 
-            if ($encryption === 'tls') {
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            } elseif ($encryption === 'ssl') {
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            } else {
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_NONE;
-            }    
+            $mail->Username = $_ENV['ADMIN_EMAIL'];
 
-            $mail->Port = $_ENV['SMTP_PORT'];
+            $mail->Password = $_ENV['ADMIN_APP_PASSWORD'];
 
-            $mail->setFrom($_ENV['SMTP_USERNAME'], 'BikriBazaar');
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+
+            $mail->Port = 587;
+
+            // EMAIL DETAILS
+
+            $mail->setFrom(
+                $_ENV['ADMIN_EMAIL'],
+                'BikriBazaar'
+            );
+
             $mail->addAddress($email);
+
             $mail->isHTML(true);
 
             $mail->Subject = 'BikriBazaar Password Reset OTP';
+
             $mail->Body = "
-                <h2>Your OTP Code</h2>
-                <h1>$otp</h1>
-                <p>This OTP will expire in 10 minutes.</p>
+
+                <div style='
+                    font-family:Segoe UI,sans-serif;
+                    padding:20px;
+                '>
+
+                    <h2 style='color:#1a3fc4;'>
+                        BikriBazaar OTP Verification
+                    </h2>
+
+                    <p>Your password reset OTP is:</p>
+
+                    <h1 style='
+                        color:#0ea5a0;
+                        letter-spacing:4px;
+                    '>
+                        $otp
+                    </h1>
+
+                    <p>
+                        This OTP will expire in 10 minutes.
+                    </p>
+
+                </div>
+
             ";
 
             $mail->send();
 
+            $redirect_url =
+                BASE_URL .
+                "verify-otp.php?email=" .
+                urlencode($email);
+
             if ($is_ajax) {
-                echo json_encode(['status' => 'success', 'redirect' => BASE_URL . "verify-otp.php?email=" . urlencode($email)]);
+
+                echo json_encode([
+                    'status' => 'success',
+                    'redirect' => $redirect_url
+                ]);
+
                 exit();
             }
 
-            header("Location: " . BASE_URL . "verify-otp.php?email=" . urlencode($email));
+            header("Location: " . $redirect_url);
+
             exit();
 
         } catch (Exception $e) {
-            $msg = "Mailer Error: {$mail->ErrorInfo}";
+
+            $msg = "Mailer Error: " . $mail->ErrorInfo;
+
             if ($is_ajax) {
-                echo json_encode(['status' => 'error', 'message' => $msg]);
+
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => $msg
+                ]);
+
                 exit();
             }
+
             $message = $msg;
         }
 
     } else {
+
         $msg = "No account found with that email address.";
+
         if ($is_ajax) {
-            echo json_encode(['status' => 'error', 'message' => $msg]);
+
+            echo json_encode([
+                'status' => 'error',
+                'message' => $msg
+            ]);
+
             exit();
         }
+
         $message = $msg;
     }
 }
