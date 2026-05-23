@@ -52,15 +52,15 @@ $image_url_with_time = $image_url ? $image_url . '?t=' . time() : '';
         }
         .profile-form-container {
             max-width: 1100px;
-            margin: 2rem auto;
-            background: #fff;
-            border-radius: 28px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-            display: flex;
-            gap: 2rem;
-            padding: 2rem;
-            flex-wrap: wrap;
-            border: 1px solid #e2e8f0;
+        margin: 2rem auto;
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 2px 18px #79797b;
+        display: flex;
+        gap: 2rem;
+        padding: 2rem;
+        flex-wrap: wrap;
+        border: 1px solid #8f9091;
         }
         .sidebar {
             flex: 0 0 240px;
@@ -133,7 +133,7 @@ $image_url_with_time = $image_url ? $image_url . '?t=' . time() : '';
             font-size: 0.75rem;
             width: 100%;
             padding: 0.5rem;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #838b95;
             border-radius: 12px;
             background: #fafcff;
             cursor: pointer;
@@ -167,7 +167,7 @@ $image_url_with_time = $image_url ? $image_url . '?t=' . time() : '';
         .olx-input {
             width: 100%;
             padding: 0.8rem 1rem;
-            border: 1.5px solid #cbd5e1;
+            border: 1.5px solid #838b95;
             border-radius: 14px;
             font-size: 0.9rem;
             font-family: inherit;
@@ -281,7 +281,7 @@ $image_url_with_time = $image_url ? $image_url . '?t=' . time() : '';
         </div>
     </div>
 </form>
-
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 <script>
     // Avatar preview & delete (unchanged logic from your working version)
     const fileInput = document.getElementById('profileImageInput');

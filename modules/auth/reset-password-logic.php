@@ -86,14 +86,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* Main wrapper – centers content and pushes footer down */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
         }
 
-        a { text-decoration: none; color: inherit; }
-
-        /* ── LOGO (clickable, above card) ── */
+        /* Logo */
         .logo-wrap {
             display: flex;
             align-items: center;
@@ -112,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border: 2px solid var(--primary);
         }
 
-        /* ── CARD ── */
+        /* Card */
         .card {
             width: 100%;
             max-width: 420px;
@@ -154,12 +161,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             line-height: 1.5;
         }
 
-        /* ── BODY ── */
+        /* Body */
         .card-body {
             padding: 1.4rem 1.8rem 1.6rem;
         }
 
-        /* alert */
+        /* Alert */
         .alert {
             display: flex;
             align-items: center;
@@ -175,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; display: flex; }
         .alert-hidden  { display: none !important; }
 
-        /* form */
+        /* Form */
         .form-group { margin-bottom: 1rem; }
         .form-group label {
             display: block;
@@ -214,7 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             box-shadow: 0 0 0 3px rgba(26,63,196,0.08);
         }
 
-        /* gradient button */
+        /* Gradient button */
         .auth-btn {
             width: 100%;
             padding: 12px;
@@ -241,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             cursor: not-allowed;
         }
 
-        /* spinner inside button */
+        /* Spinner */
         .spinner {
             width: 15px;
             height: 15px;
@@ -255,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             to { transform: rotate(360deg); }
         }
 
-        /* back link (optional, but can be added) */
+        /* Back link */
         .back-link {
             text-align: center;
             margin-top: 1.1rem;
@@ -278,70 +285,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 
-<!-- LOGO (clickable) -->
-<a href="index.php" class="logo-wrap">
-    <img src="assets/images/logo.png" alt="BikriBazaar" onerror="this.style.display='none'">
-    Bikri<span>Bazaar</span>
-</a>
+<div class="main-wrapper">
+    <!-- Logo -->
+    <a href="index.php" class="logo-wrap">
+        <img src="assets/images/logo.png" alt="BikriBazaar" onerror="this.style.display='none'">
+        Bikri<span>Bazaar</span>
+    </a>
 
-<!-- CARD -->
-<div class="card">
-    <div class="card-header">
-        <div class="icon-circle">
-            <i class="fa-solid fa-lock"></i>
-        </div>
-        <h1>Reset Password</h1>
-        <p>Enter your new password below</p>
-    </div>
-
-    <div class="card-body">
-
-        <!-- ALERT MESSAGE -->
-        <div id="ajax-message" class="alert alert-hidden">
-            <i class="fa-solid fa-circle-exclamation" id="alert-icon"></i>
-            <span id="alert-text"></span>
-        </div>
-
-        <?php if($message != ''): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function(){
-                const box = document.getElementById('ajax-message');
-                box.classList.remove('alert-hidden');
-                box.classList.add('alert-error');
-                document.getElementById('alert-text').innerText = <?php echo json_encode($message); ?>;
-            });
-        </script>
-        <?php endif; ?>
-
-        <form method="POST" id="resetForm">
-            <div class="form-group">
-                <label for="password">New Password</label>
-                <div class="inp">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="password" name="password" placeholder="Enter new password" required>
-                </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="icon-circle">
+                <i class="fa-solid fa-lock"></i>
             </div>
-            <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
-                <div class="inp">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
-                </div>
+            <h1>Reset Password</h1>
+            <p>Enter your new password below</p>
+        </div>
+
+        <div class="card-body">
+            <div id="ajax-message" class="alert alert-hidden">
+                <i class="fa-solid fa-circle-exclamation" id="alert-icon"></i>
+                <span id="alert-text"></span>
             </div>
 
-            <button type="submit" class="auth-btn" id="submitBtn">
-                <div class="spinner" id="spinner"></div>
-                <i class="fa-solid fa-check-circle" id="btn-icon"></i>
-                <span id="btn-text">Update Password</span>
-            </button>
-        </form>
+            <?php if($message != ''): ?>
+            <script>
+                document.addEventListener('DOMContentLoaded', function(){
+                    const box = document.getElementById('ajax-message');
+                    box.classList.remove('alert-hidden');
+                    box.classList.add('alert-error');
+                    document.getElementById('alert-text').innerText = <?php echo json_encode($message); ?>;
+                });
+            </script>
+            <?php endif; ?>
 
-        <div class="back-link">
-            <a href="forgot-password.php"><i class="fa-solid fa-arrow-left"></i> Back to Forgot Password</a>
+            <form method="POST" id="resetForm">
+                <div class="form-group">
+                    <label for="password">New Password</label>
+                    <div class="inp">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter new password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="inp">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn" id="submitBtn">
+                    <div class="spinner" id="spinner"></div>
+                    <i class="fa-solid fa-check-circle" id="btn-icon"></i>
+                    <span id="btn-text">Update Password</span>
+                </button>
+            </form>
+
+            <div class="back-link">
+                <a href="forgot-password.php"><i class="fa-solid fa-arrow-left"></i> Back to Forgot Password</a>
+            </div>
         </div>
-
     </div>
 </div>
+
+<!-- SHARED FOOTER -->
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 <script>
 document.getElementById('resetForm').addEventListener('submit', function(e) {

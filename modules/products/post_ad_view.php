@@ -52,6 +52,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
             border-radius: 24px;
             box-shadow: 0 4px 9px #797791;
              border: 1px solid #9a9aaf;
+             
 
         }
 
@@ -304,6 +305,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         </button>
     </form>
 </div>
+<?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 <script>
     const dt = new DataTransfer();
