@@ -21,10 +21,12 @@ $unread_stmt = mysqli_prepare($conn, $unread_sql);
 mysqli_stmt_bind_param($unread_stmt, 'i', $user_id);
 mysqli_stmt_execute($unread_stmt);
 $unread_res = mysqli_stmt_get_result($unread_stmt);
+
 if($unread_res){
     $unread_data = mysqli_fetch_assoc($unread_res);
     $unread_count = $unread_data['total'];
 }
+
 mysqli_stmt_close($unread_stmt);
 
 // Fetch all products and tally their statuses
@@ -33,6 +35,7 @@ $sql = "SELECT products.*,
         FROM products 
         WHERE user_id = ? 
         ORDER BY id DESC";
+
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, 'i', $user_id);
 mysqli_stmt_execute($stmt);
@@ -44,9 +47,8 @@ $sold_count = 0;
 
 while($row = mysqli_fetch_assoc($result)) {
     $products[] = $row;
-    
-    $status = isset($row['status']) ? $row['status'] : 'active'; 
-    if($status == 'active') {
+    $status = isset($row['status']) ? $row['status'] : 'active';
+    if($status == 'active'){
         $active_count++;
     } else {
         $sold_count++;
@@ -64,15 +66,15 @@ $total_ads = count($products);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --primary:      #1a3fc4;
+            --primary: #1a3fc4;
             --primary-dark: #1530a0;
-            --teal:         #0ea5a0;
-            --teal-dark:    #0b8a86;
-            --grad:         linear-gradient(135deg, #1a3fc4 0%, #0ea5a0 100%);
-            --text:         #1a1a2e;
-            --muted:        #6b7280;
-            --border:       #e2e8f0;
-            --surface:      #eef2ff;
+            --teal: #0ea5a0;
+            --teal-dark: #0b8a86;
+            --grad: linear-gradient(135deg, #1a3fc4 0%, #0ea5a0 100%);
+            --text: #1a1a2e;
+            --muted: #6b7280;
+            --border: #e2e8f0;
+            --surface: #eef2ff;
         }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -83,22 +85,19 @@ $total_ads = count($products);
             color: var(--text);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;  /* ← FLEX COLUMN FOR STICKY FOOTER */
+            flex-direction: column;  /* for sticky footer */
         }
 
         a { text-decoration: none; color: inherit; }
-
-        /* ===== NAVBAR CSS REMOVED – styles come from shared/components/navbar.php ===== */
 
         /* PAGE CONTENT */
         .page {
             max-width: 1100px;
             margin: 2rem auto;
             padding: 0px 1px;
-            border: 1px solid #989fbb; 
+            border: 1px solid #989fbb;
             border-radius: 17px;
-            flex: 1;  /* ← PUSHES FOOTER DOWN */
-            width:68vw;
+            flex: 1;               /* pushes footer down */
         }
 
         .top-bar {
@@ -167,7 +166,6 @@ $total_ads = count($products);
             gap: 1.1rem;
             padding: 0 1rem 1rem;
         }
-
         .ad-card {
             background: #fff;
             border: 1px solid var(--border);
@@ -177,6 +175,10 @@ $total_ads = count($products);
             display: flex;
             flex-direction: column;
             position: relative;
+        }
+        .boosted-ad-card {
+            border: 2px solid #f59e0b;
+            box-shadow: 0 6px 24px rgba(245, 158, 11, 0.18);
         }
         .ad-card.sold-card {
             opacity: 0.8;
@@ -200,7 +202,6 @@ $total_ads = count($products);
             transition: transform 0.3s;
         }
         .ad-card:hover .ad-img-wrap img { transform: scale(1.04); }
-
         .ad-category {
             position: absolute;
             top: 9px;
@@ -214,7 +215,6 @@ $total_ads = count($products);
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
-
         .sold-overlay {
             position: absolute;
             inset: 0;
@@ -235,7 +235,6 @@ $total_ads = count($products);
             letter-spacing: 2px;
             text-transform: uppercase;
         }
-
         .ad-body {
             padding: 0.9rem 1rem 0;
             flex: 1;
@@ -272,7 +271,7 @@ $total_ads = count($products);
             gap: 0.5rem;
             padding: 0.75rem 1rem 0.9rem;
         }
-        .btn-edit, .btn-delete, .btn-sold, .btn-sold-static {
+        .btn-edit, .btn-delete, .btn-sold, .btn-sold-static, .btn-boost {
             flex: 1;
             text-align: center;
             padding: 0.48rem 0;
@@ -299,15 +298,17 @@ $total_ads = count($products);
             border: 1.5px solid #fecaca;
         }
         .btn-delete:hover { background: #fee2e2; transform: translateY(-1px); }
-
         .btn-sold {
             background: #ecfdf5;
             color: #059669;
             border: 1.5px solid #a7f3d0;
-            width: 100%;
         }
         .btn-sold:hover { background: #d1fae5; transform: translateY(-1px); }
-
+        .btn-boost {
+            background: linear-gradient(135deg, #1a3fc4 0%, #0ea5a0 100%);
+            color: #fff;
+        }
+        .btn-boost:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-sold-static {
             background: #f3f4f6;
             color: #6b7280;
@@ -316,7 +317,7 @@ $total_ads = count($products);
             flex: 2;
         }
 
-        /* === EMPTY STATE – centered card === */
+        /* Empty state */
         .empty-state {
             text-align: center;
             background: #fff;
@@ -410,10 +411,13 @@ $total_ads = count($products);
 
     <?php if($total_ads > 0): ?>
         <div class="ads-grid">
-            <?php foreach($products as $product): ?>
-                <?php $is_sold = (isset($product['status']) && $product['status'] === 'sold'); ?>
-                
-                <div class="ad-card <?php echo $is_sold ? 'sold-card' : ''; ?>">
+            <?php foreach($products as $product):
+                $is_sold = (isset($product['status']) && $product['status'] === 'sold');
+                // Check if product has an active paid boost (using boost_expiry or boost_expires_at)
+                $has_paid_plan = (!empty($product['boost_type']) && strtolower($product['boost_type']) != 'free' &&
+                                   !empty($product['boost_expiry']) && strtotime($product['boost_expiry']) > time());
+            ?>
+                <div class="ad-card <?php echo $is_sold ? 'sold-card' : ''; ?> <?php echo $has_paid_plan ? 'boosted-ad-card' : ''; ?>">
                     <div class="ad-img-wrap">
                         <?php 
                             $displayImage = !empty($product['image']) ? $product['image'] : BASE_URL . 'assets/images/default-placeholder.png';
@@ -422,7 +426,9 @@ $total_ads = count($products);
                              alt="<?php echo htmlspecialchars($product['title']); ?>"
                              loading="lazy">
                         
-                        <?php if(!empty($product['category'])): ?>
+                        <?php if($has_paid_plan): ?>
+                            <span class="ad-category"><?php echo strtoupper(htmlspecialchars($product['boost_type'])); ?></span>
+                        <?php elseif(!empty($product['category'])): ?>
                             <span class="ad-category"><?php echo htmlspecialchars($product['category']); ?></span>
                         <?php endif; ?>
                         
@@ -444,9 +450,18 @@ $total_ads = count($products);
 
                     <div class="ad-actions">
                         <?php if(!$is_sold): ?>
+                            <?php if($has_paid_plan): ?>
+                                <button class="btn-boost" disabled style="opacity:0.8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-circle-check"></i> Boosted
+                                </button>
+                            <?php else: ?>
+                                <a href="../modules/payments/plans_controller.php?product_id=<?php echo $product['id']; ?>" class="btn-boost">
+                                    <i class="fa-solid fa-bolt"></i> Boost
+                                </a>
+                            <?php endif; ?>
                             <form method="POST" action="../modules/products/mark_sold.php" style="flex: 1;">
                                 <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                <button type="submit" class="btn-sold" onclick="return confirm('Mark this item as sold? It will be hidden from search results.');">
+                                <button type="submit" class="btn-sold" onclick="return confirm('Mark this item as sold?');">
                                     <i class="fa-solid fa-check"></i> Sold
                                 </button>
                             </form>
