@@ -456,9 +456,9 @@ $total_ads = count($products);
                                     <i class="fa-solid fa-circle-check"></i> Boosted
                                 </button>
                             <?php else: ?>
-                                <a href="../modules/payments/plans_controller.php?product_id=<?php echo $product['id']; ?>" class="btn-boost">
-                                    <i class="fa-solid fa-bolt"></i> Boost
-                                </a>
+                                <a href="<?php echo BASE_URL; ?>plan_page.php?product_id=<?php echo $product['id']; ?>" class="btn-boost">
+    <i class="fa-solid fa-bolt"></i> Boost
+</a>
                             <?php endif; ?>
                             <form method="POST" action="../modules/products/mark_sold.php" style="flex: 1;">
                                 <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">

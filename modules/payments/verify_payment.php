@@ -13,176 +13,68 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
 
-header('Content-Type: application/json');
-
-// =========================
-// VALIDATE USER
-// =========================
-
 if (!isset($_SESSION['user_id'])) {
 
-    echo json_encode([
-        'success' => false,
-        'message' => 'Please login first'
-    ]);
-
-    exit;
+    die("Please login first.");
 }
 
 $user_id = intval($_SESSION['user_id']);
 
-// =========================
-// RAZORPAY INIT
-// =========================
+$product_id = intval($_GET['product_id'] ?? 0);
 
-try {
-
-    $razorpay = new Api(
-        RAZORPAY_KEY_ID,
-        RAZORPAY_KEY_SECRET
-    );
-
-} catch (Exception $e) {
-
-    echo json_encode([
-        'success' => false,
-        'message' => 'Razorpay initialization failed'
-    ]);
-
-    exit;
-}
-
-// =========================
-// GET POST DATA
-// =========================
-
-$product_id = isset($_POST['product_id'])
-    ? intval($_POST['product_id'])
-    : 0;
-
-$plan_id = isset($_POST['plan_id'])
-    ? intval($_POST['plan_id'])
-    : 0;
-
-$plan_name = trim($_POST['plan_name'] ?? '');
-
-$amount = isset($_POST['amount'])
-    ? floatval($_POST['amount'])
-    : 0;
-
-$payment_mode = $_POST['payment_mode'] ?? 'razorpay';
-
-// =========================
-// VALIDATIONS
-// =========================
-
-if ($product_id <= 0) {
-
-    echo json_encode([
-        'success' => false,
-        'message' => 'Invalid product'
-    ]);
-
-    exit;
-}
-
-// =========================
-// FREE PLAN HANDLER
-// =========================
-
-if ($payment_mode === 'free') {
-
-    try {
-
-        $update_sql = "
-            UPDATE products
-            SET
-                boost_type = 'free',
-                is_boosted = 0,
-                is_featured = 0,
-                is_urgent = 0,
-                boost_expiry = NULL
-            WHERE id = ?
-        ";
-
-        $stmt = $conn->prepare($update_sql);
-
-        $stmt->bind_param("i", $product_id);
-
-        $stmt->execute();
-
-        $payment_status = 'free';
-
-        $insert_sql = "
-            INSERT INTO payment
-            (
-                user_id,
-                product_id,
-                plan_name,
-                amount,
-                payment_status
-            )
-            VALUES (?, ?, ?, ?, ?)
-        ";
-
-        $insert_stmt = $conn->prepare($insert_sql);
-
-        $insert_stmt->bind_param(
-            "iisds",
-            $user_id,
-            $product_id,
-            $plan_name,
-            $amount,
-            $payment_status
-        );
-
-        $insert_stmt->execute();
-
-        echo json_encode([
-            'success' => true
-        ]);
-
-    } catch (Exception $e) {
-
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-
-    exit;
-}
-
-// =========================
-// RAZORPAY VARIABLES
-// =========================
+$plan_key = trim($_GET['plan'] ?? '');
 
 $razorpay_payment_id =
-    trim($_POST['razorpay_payment_id'] ?? '');
+    trim($_GET['razorpay_payment_id'] ?? '');
 
 $razorpay_order_id =
-    trim($_POST['razorpay_order_id'] ?? '');
+    trim($_GET['razorpay_order_id'] ?? '');
 
 $razorpay_signature =
-    trim($_POST['razorpay_signature'] ?? '');
+    trim($_GET['razorpay_signature'] ?? '');
 
 // =========================
 // VALIDATIONS
 // =========================
 
 if (
+    $product_id <= 0 ||
+    empty($plan_key) ||
     empty($razorpay_payment_id) ||
     empty($razorpay_order_id) ||
     empty($razorpay_signature)
 ) {
 
-    echo json_encode([
-        'success' => false,
-        'message' => 'Missing payment credentials'
-    ]);
-
-    exit;
+    die("Invalid payment request.");
 }
+
+// =========================
+// LOAD PLANS
+// =========================
+
+$plans = require __DIR__ . '/../../shared/plans.php';
+
+if (!isset($plans[$plan_key])) {
+
+    die("Invalid plan selected.");
+}
+
+$plan = $plans[$plan_key];
+
+$plan_name = $plan['name'];
+
+$amount = $plan['price'];
+
+$duration = intval($plan['duration']);
+
+// =========================
+// RAZORPAY INIT
+// =========================
+
+$api = new Api(
+    $_ENV['RAZORPAY_KEY_ID'],
+    $_ENV['RAZORPAY_KEY_SECRET']
+);
 
 // =========================
 // VERIFY SIGNATURE
@@ -197,25 +89,19 @@ try {
         'razorpay_payment_id' => $razorpay_payment_id,
 
         'razorpay_signature' => $razorpay_signature
+
     ];
 
-    $razorpay->utility->verifyPaymentSignature($attributes);
+    $api->utility->verifyPaymentSignature($attributes);
 
 } catch (SignatureVerificationError $e) {
 
-    echo json_encode([
-        'success' => false,
-        'message' => 'Invalid payment signature'
-    ]);
-
-    exit;
+    die("Payment verification failed.");
 }
 
 // =========================
 // PLAN SETTINGS
 // =========================
-
-$boost_type = 'basic';
 
 $is_boosted = 1;
 
@@ -223,80 +109,37 @@ $is_featured = 0;
 
 $is_urgent = 0;
 
-$boost_days = 7;
+$boost_type = $plan_key;
 
 // =========================
-// PLAN-WISE LOGIC
+// PLAN BASED FEATURES
 // =========================
 
-switch ($plan_id) {
+if ($plan_key === "special") {
 
-    case 2:
+    $is_featured = 1;
+}
 
-        $boost_type = 'basic';
-        $boost_days = 7;
+if ($plan_key === "premium") {
 
-        break;
+    $is_featured = 1;
 
-    case 3:
-
-        $boost_type = 'premium';
-        $boost_days = 15;
-
-        break;
-
-    case 4:
-
-        $boost_type = 'featured';
-        $is_featured = 1;
-        $boost_days = 15;
-
-        break;
-
-    case 5:
-
-        $boost_type = 'urgent';
-        $is_urgent = 1;
-        $boost_days = 5;
-
-        break;
-
-    case 6:
-
-        $boost_type = 'mega';
-        $is_featured = 1;
-        $boost_days = 30;
-
-        break;
-
-    case 7:
-
-        $boost_type = 'seller_subscription';
-        $is_featured = 1;
-        $boost_days = 30;
-
-        break;
-
-    case 8:
-
-        $boost_type = 'shop_plan';
-        $is_featured = 1;
-        $boost_days = 30;
-
-        break;
+    $is_urgent = 1;
 }
 
 // =========================
-// BOOST EXPIRY
+// DATES
 // =========================
+
+$start_date = date('Y-m-d H:i:s');
 
 $boost_expiry = date(
     'Y-m-d H:i:s',
-    strtotime("+$boost_days days")
+    strtotime("+$duration days")
 );
 
 // =========================
-// DATABASE TRANSACTION
+// TRANSACTION START
 // =========================
 
 $conn->begin_transaction();
@@ -308,56 +151,86 @@ try {
     // =========================
 
     $update_sql = "
+
         UPDATE products
         SET
+
             boost_type = ?,
+            boost_plan = ?,
             is_boosted = ?,
             is_featured = ?,
             is_urgent = ?,
             boost_expiry = ?
+
         WHERE id = ?
+
     ";
 
     $update_stmt = $conn->prepare($update_sql);
 
     $update_stmt->bind_param(
-        "siiisi",
+
+        "ssiissi",
+
         $boost_type,
+        $plan_name,
         $is_boosted,
         $is_featured,
         $is_urgent,
         $boost_expiry,
         $product_id
+
     );
 
     $update_stmt->execute();
 
     // =========================
-    // UPDATE PAYMENT RECORD
+    // INSERT PAYMENT RECORD
     // =========================
 
-    $payment_status = 'paid';
+    $payment_status = "success";
 
-    $payment_sql = "
-        UPDATE payment
-        SET
-            razorpay_payment_id = ?,
-            razorpay_signature = ?,
-            payment_status = ?
-        WHERE razorpay_order_id = ?
+    $insert_sql = "
+
+        INSERT INTO payment (
+
+            user_id,
+            product_id,
+            plan_name,
+            amount,
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+            payment_status,
+            start_date,
+            expiry_date
+
+        )
+
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
     ";
 
-    $payment_stmt = $conn->prepare($payment_sql);
+    $insert_stmt = $conn->prepare($insert_sql);
 
-    $payment_stmt->bind_param(
-        "ssss",
+    $insert_stmt->bind_param(
+
+        "iisdssssss",
+
+        $user_id,
+        $product_id,
+        $plan_name,
+        $amount,
+        $razorpay_order_id,
         $razorpay_payment_id,
         $razorpay_signature,
         $payment_status,
-        $razorpay_order_id
+        $start_date,
+        $boost_expiry
+
     );
 
-    $payment_stmt->execute();
+    $insert_stmt->execute();
 
     // =========================
     // COMMIT
@@ -365,23 +238,39 @@ try {
 
     $conn->commit();
 
-    echo json_encode([
-
-        'success' => true,
-
-        'message' => 'Payment verified successfully'
-    ]);
-
 } catch (Exception $e) {
 
     $conn->rollback();
 
-    echo json_encode([
-
-        'success' => false,
-
-        'message' => $e->getMessage()
-    ]);
+    die($e->getMessage());
 }
 
-?>
+// =========================
+// MAILS
+// =========================
+
+require_once __DIR__ . '/send_purchase_mail.php';
+
+// Demo plan:
+// instantly trigger expiry mail too
+
+if ($plan_key === "demo") {
+
+    require_once __DIR__ . '/send_expiry_mail.php';
+}
+
+// =========================
+// SUCCESS REDIRECT
+// =========================
+
+header(
+
+    "Location: " .
+
+    BASE_URL .
+
+    "payment_success.php"
+
+);
+
+exit;
