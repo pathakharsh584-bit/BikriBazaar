@@ -71,29 +71,342 @@ if(isset($_GET['condition']) && is_array($_GET['condition'])){
     $sql .= " AND `condition` IN ($cond_str)"; 
 }
 
-// Dynamic Sorting
-$sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
-if ($sort === 'price_low') {
-    $sql .= " ORDER BY price ASC";
-} elseif ($sort === 'price_high') {
-    $sql .= " ORDER BY price DESC";
-} elseif ($sort === 'oldest') {
-    $sql .= " ORDER BY id ASC";
-} else {
-    $sql .= " ORDER BY id DESC"; 
+// =========================
+// DYNAMIC SORTING LOGIC
+// =========================
+
+$sort = isset($_GET['sort']) ? trim($_GET['sort']) : '';
+
+// Detect if search/filter/sort is applied
+
+$has_filters = (
+
+    !empty($search) ||
+
+    !empty($category) ||
+
+    !empty($_GET['min_price']) ||
+
+    !empty($_GET['max_price']) ||
+
+    !empty($_GET['city']) ||
+
+    !empty($_GET['condition']) ||
+
+    !empty($sort)
+
+);
+
+// =========================
+// FILTERED / SEARCH RESULTS
+// =========================
+
+if($has_filters){
+
+    // Price Low → High
+
+    if ($sort === 'price_low') {
+
+        $sql .= "
+
+            ORDER BY
+
+                is_urgent DESC,
+                is_featured DESC,
+                is_boosted DESC,
+                price ASC
+
+        ";
+
+    }
+
+    // Price High → Low
+
+    elseif ($sort === 'price_high') {
+
+        $sql .= "
+
+            ORDER BY
+
+                is_urgent DESC,
+                is_featured DESC,
+                is_boosted DESC,
+                price DESC
+
+        ";
+
+    }
+
+    // Oldest First
+
+    elseif ($sort === 'oldest') {
+
+        $sql .= "
+
+            ORDER BY
+
+                is_urgent DESC,
+                is_featured DESC,
+                is_boosted DESC,
+                id ASC
+
+        ";
+
+    }
+
+    // Default Filter Sorting
+
+    else {
+
+        $sql .= "
+
+            ORDER BY
+
+                is_urgent DESC,
+                is_featured DESC,
+                is_boosted DESC,
+                id DESC
+
+        ";
+
+    }
+
 }
 
-$result = mysqli_query($conn, $sql);
+// =========================
+// HOME PAGE
+// =========================
 
+else{
 
-if (!$result) {
-    die("<div style='padding:2rem; background:#fee2e2; border: 1px solid #ef4444; color:#991b1b; font-family:sans-serif; margin: 2rem; border-radius: 8px;'>
-            <h3 style='margin-top: 0;'>Database Error!</h3>
-            <p><strong>MySQL Says:</strong> " . mysqli_error($conn) . "</p>
-            <p style='background: #fef2f2; padding: 1rem; border-radius: 4px; border: 1px solid #fca5a5;'><strong>Query:</strong> " . $sql . "</p>
-         </div>");
+    // Random shuffle for fair visibility
+
+    $sql .= " ORDER BY RAND() ";
+
 }
 
+// ======================================
+// FEED ENGINE START
+// ======================================
+
+$normal_products  = [];
+$premium_products = [];
+$special_products = [];
+$basic_products   = [];
+
+// ======================================
+// NORMAL PRODUCTS
+// ======================================
+
+$normal_sql = "
+
+SELECT products.*,
+
+(
+    SELECT image_path
+    FROM product_images
+    WHERE product_id = products.id
+    ORDER BY id ASC
+    LIMIT 1
+) as image,
+
+'' as plan_badge
+
+FROM products
+
+WHERE status='active'
+
+AND (
+    boost_type IS NULL
+    OR boost_type = ''
+    OR LOWER(boost_type) = 'free'
+)
+
+ORDER BY RAND()
+
+";
+
+$normal_result = mysqli_query($conn, $normal_sql);
+
+while($row = mysqli_fetch_assoc($normal_result)){
+
+    $normal_products[] = $row;
+}
+
+// ======================================
+// PREMIUM PRODUCTS
+// ======================================
+
+$premium_sql = "
+
+SELECT products.*,
+
+(
+    SELECT image_path
+    FROM product_images
+    WHERE product_id = products.id
+    ORDER BY id ASC
+    LIMIT 1
+) as image,
+
+'PREMIUM' as plan_badge
+
+FROM products
+
+WHERE status='active'
+
+AND LOWER(boost_type)='premium'
+
+AND boost_expiry > NOW()
+
+ORDER BY RAND()
+
+";
+
+$premium_result = mysqli_query($conn, $premium_sql);
+
+while($row = mysqli_fetch_assoc($premium_result)){
+
+    $premium_products[] = $row;
+}
+
+// ======================================
+// SPECIAL PRODUCTS
+// ======================================
+
+$special_sql = "
+
+SELECT products.*,
+
+(
+    SELECT image_path
+    FROM product_images
+    WHERE product_id = products.id
+    ORDER BY id ASC
+    LIMIT 1
+) as image,
+
+'SPECIAL' as plan_badge
+
+FROM products
+
+WHERE status='active'
+
+AND LOWER(boost_type)='special'
+
+AND boost_expiry > NOW()
+
+ORDER BY RAND()
+
+";
+
+$special_result = mysqli_query($conn, $special_sql);
+
+while($row = mysqli_fetch_assoc($special_result)){
+
+    $special_products[] = $row;
+}
+
+// ======================================
+// BASIC PRODUCTS
+// ======================================
+
+$basic_sql = "
+
+SELECT products.*,
+
+(
+    SELECT image_path
+    FROM product_images
+    WHERE product_id = products.id
+    ORDER BY id ASC
+    LIMIT 1
+) as image,
+
+'BASIC' as plan_badge
+
+FROM products
+
+WHERE status='active'
+
+AND LOWER(boost_type)='basic'
+
+AND boost_expiry > NOW()
+
+ORDER BY RAND()
+
+";
+
+$basic_result = mysqli_query($conn, $basic_sql);
+
+while($row = mysqli_fetch_assoc($basic_result)){
+
+    $basic_products[] = $row;
+}
+
+// ======================================
+// FINAL FEED
+// ======================================
+
+$final_feed = [];
+
+$normal_index  = 0;
+$premium_index = 0;
+$special_index = 0;
+$basic_index   = 0;
+
+$cycle = 0;
+
+while($normal_index < count($normal_products)){
+
+    // 5 NORMAL PRODUCTS
+
+    for($i = 0; $i < 5; $i++){
+
+        if(isset($normal_products[$normal_index])){
+
+            $final_feed[] = $normal_products[$normal_index];
+
+            $normal_index++;
+        }
+    }
+
+    // PROMOTIONAL INJECTION
+
+    if($cycle % 6 <= 2){
+
+        if(isset($premium_products[$premium_index])){
+
+            $final_feed[] = $premium_products[$premium_index];
+
+            $premium_index++;
+        }
+
+    }elseif($cycle % 6 <= 4){
+
+        if(isset($special_products[$special_index])){
+
+            $final_feed[] = $special_products[$special_index];
+
+            $special_index++;
+        }
+
+    }else{
+
+        if(isset($basic_products[$basic_index])){
+
+            $final_feed[] = $basic_products[$basic_index];
+
+            $basic_index++;
+        }
+    }
+
+    $cycle++;
+}
+
+// ======================================
+// FEED ENGINE END
+// ======================================
 
 $unread_count = 0;
 if (isset($_SESSION['user_id'])) {
@@ -477,9 +790,9 @@ if (isset($_SESSION['user_id'])) {
         <span><strong>Stay safe:</strong> Never share OTP or pay in advance. Meet sellers in public places.</span>
     </div>
 
-    <?php if($result && mysqli_num_rows($result) > 0) { ?>
+    <?php if(count($final_feed) > 0) { ?>
         <div class="products-grid">
-            <?php while($product = mysqli_fetch_assoc($result)) {
+            <?php foreach($final_feed as $product) {
                 // Check if this product is already in the current user's favourites
                 $is_fav = in_array(intval($product['id']), $user_favourites);
             ?>
