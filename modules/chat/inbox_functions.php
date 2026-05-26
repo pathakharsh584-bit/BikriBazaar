@@ -13,8 +13,9 @@ function getLatestUserChats($conn, $current_user) {
                 SELECT 
                     MAX(inner_m.id) AS max_id
                 FROM messages AS inner_m
-                WHERE inner_m.sender_id = $current_user 
-                   OR inner_m.receiver_id = $current_user 
+                WHERE (inner_m.sender_id = $current_user OR inner_m.receiver_id = $current_user)
+                  /* CHANGED: Don't look at messages this user has soft-deleted */
+                  AND (inner_m.deleted_by IS NULL OR inner_m.deleted_by != $current_user)
                 GROUP BY 
                     inner_m.product_id, 
                     LEAST(inner_m.sender_id, inner_m.receiver_id), 
@@ -24,6 +25,8 @@ function getLatestUserChats($conn, $current_user) {
                 ON (u.id = m.sender_id OR u.id = m.receiver_id) 
                AND u.id != $current_user
             INNER JOIN products p ON p.id = m.product_id
+            /* CHANGED: Final check to ensure the outer row isn't a soft-deleted message */
+            WHERE (m.deleted_by IS NULL OR m.deleted_by != $current_user)
             ORDER BY m.id DESC";
 
     $result = mysqli_query($conn, $sql);
