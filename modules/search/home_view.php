@@ -418,7 +418,21 @@ if (isset($_SESSION['user_id'])) {
         $unread_count = $unread_data['total'];
     }
 }
+// ======================================
+// FILTERED RESULTS OVERRIDE
+// ======================================
 
+if($has_filters){
+
+    $filtered_result = mysqli_query($conn, $sql);
+
+    $final_feed = [];
+
+    while($row = mysqli_fetch_assoc($filtered_result)){
+
+        $final_feed[] = $row;
+    }
+}
 
 // Fetch the user's existing favourites so we can pre-fill the heart icons on page load 
 $user_favourites = [];
