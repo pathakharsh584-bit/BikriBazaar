@@ -1,6 +1,7 @@
 <?php
 // shared/components/navbar.php
 // Make sure session is started before including this file.
+require_once __DIR__ . '/../config.php';
 ?>
 <style>
     :root {
@@ -202,6 +203,27 @@
         border-radius: 20px;
         margin-left: auto;
     }
+
+    /* Avatar Notification Badge */
+    .avatar-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 800;
+        height: 18px;
+        min-width: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        border: 2px solid #ffffff;
+        z-index: 10;
+        pointer-events: none; /* Ensures the badge doesn't interrupt the hover dropdown */
+    }
     /* Responsive */
     @media (max-width: 768px) {
         .navbar { padding: 0 1rem; }
@@ -238,6 +260,12 @@
                         <?php echo isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U'; ?>
                     <?php endif; ?>
                 </div>
+
+                <?php if (isset($unread_count) && $unread_count > 0): ?>
+                    <span class="avatar-badge">
+                        <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
+                    </span>
+                <?php endif; ?>
                 <div class="dropdown-content">
                     <div class="dropdown-user-meta">
                         <strong>Hi, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User'; ?></strong>
@@ -270,3 +298,85 @@
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Absolute URL using BASE_URL
+    const unreadApiUrl = "<?php echo BASE_URL; ?>get_unread_count.php";
+
+    async function updateUnreadCount() {
+
+        try {
+
+            const response = await fetch(unreadApiUrl);
+            const data = await response.json();
+
+            const count = parseInt(data.count) || 0;
+
+            // Existing badges
+            let avatarBadge = document.querySelector('.avatar-badge');
+            let dropdownBadge = document.querySelector('.dropdown-badge');
+
+            // Elements
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            const msgLink = document.querySelector('a[href="inbox.php"]');
+
+            // USER HAS UNREAD MESSAGES
+            if (count > 0) {
+
+                // Create avatar badge if missing
+                if (!avatarBadge && profileDropdown) {
+
+                    avatarBadge = document.createElement('span');
+                    avatarBadge.className = 'avatar-badge';
+
+                    profileDropdown.appendChild(avatarBadge);
+                }
+
+                // Create dropdown badge if missing
+                if (!dropdownBadge && msgLink) {
+
+                    dropdownBadge = document.createElement('span');
+                    dropdownBadge.className = 'dropdown-badge';
+
+                    msgLink.appendChild(dropdownBadge);
+                }
+
+                // Update counts
+                if (avatarBadge) {
+                    avatarBadge.innerText = count > 99 ? '99+' : count;
+                }
+
+                if (dropdownBadge) {
+                    dropdownBadge.innerText = count;
+                }
+
+            } 
+            
+            // NO UNREAD MESSAGES
+            else {
+
+                if (avatarBadge) {
+                    avatarBadge.remove();
+                }
+
+                if (dropdownBadge) {
+                    dropdownBadge.remove();
+                }
+            }
+
+        } catch (err) {
+
+            console.error("Unread count fetch failed:", err);
+        }
+    }
+
+    // Initial fetch
+    updateUnreadCount();
+
+    // Poll every 3 seconds
+    setInterval(updateUnreadCount, 3000);
+
+});
+</script>

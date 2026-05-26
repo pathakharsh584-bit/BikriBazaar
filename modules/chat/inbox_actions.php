@@ -221,6 +221,60 @@ $result = getLatestUserChats($conn, $current_user);
             color: var(--muted);
             border-top: 1px solid rgba(0,0,0,0.05);
         }
+
+        .chat-item-wrapper{
+    position: relative;
+}
+
+.chat-link{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 3.5rem 1rem 1rem;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.chat-link:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(26,63,196,0.1);
+    border-color: var(--teal);
+}
+
+.delete-chat-btn{
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #fee2e2;
+    color: #dc2626;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+.delete-chat-btn:hover{
+    background: #dc2626;
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
         
         @media (max-width: 640px) {
             .inbox-container { padding: 0.75rem; }
@@ -245,33 +299,76 @@ $result = getLatestUserChats($conn, $current_user);
         
         <div id="inbox-list-container" class="chat-list">
             <?php if(mysqli_num_rows($result) > 0): ?>
-                <?php while($chat = mysqli_fetch_assoc($result)): ?>
-                    <?php 
-                        $prefix = ($chat['sender_id'] == $current_user) ? '<span class="my-prefix">You: </span>' : '';
-                    ?>
-                    <a href="chat.php?product_id=<?php echo $chat['product_id']; ?>&receiver_id=<?php echo $chat['partner_id']; ?>" class="chat-item">
-                        <div class="partner-avatar">
-                            <?php echo substr(htmlspecialchars($chat['partner_name']), 0, 1); ?>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-meta">
-                                <span class="partner-name"><?php echo htmlspecialchars($chat['partner_name']); ?></span>
-                                <span class="product-tag"><?php echo htmlspecialchars($chat['product_title']); ?></span>
-                            </div>
-                            <div class="last-message"><?php echo $prefix . htmlspecialchars($chat['message']); ?></div>
-                        </div>
-                        <?php if($chat['is_seen'] == 0 && $chat['receiver_id'] == $current_user): ?>
-                            <div class="unread-dot"></div>
-                        <?php endif; ?>
-                    </a>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <div class="empty-state">
-                    <i class="fa-regular fa-inbox"></i>
-                    <h3>No active chats found</h3>
-                    <p style="margin-top: 0.5rem;">Conversations with other users will appear here.</p>
+
+    <?php while($chat = mysqli_fetch_assoc($result)): ?>
+
+        <?php 
+            $prefix = ($chat['sender_id'] == $current_user) 
+                ? '<span class="my-prefix">You: </span>' 
+                : '';
+        ?>
+
+        <div class="chat-item-wrapper">
+
+            <a 
+                href="chat.php?product_id=<?php echo $chat['product_id']; ?>&receiver_id=<?php echo $chat['partner_id']; ?>" 
+                class="chat-link"
+            >
+
+                <div class="partner-avatar">
+                    <?php echo substr(htmlspecialchars($chat['partner_name']), 0, 1); ?>
                 </div>
-            <?php endif; ?>
+
+                <div class="chat-info">
+
+                    <div class="chat-meta">
+
+                        <span class="partner-name">
+                            <?php echo htmlspecialchars($chat['partner_name']); ?>
+                        </span>
+
+                        <span class="product-tag">
+                            <?php echo htmlspecialchars($chat['product_title']); ?>
+                        </span>
+
+                    </div>
+
+                    <div class="last-message">
+                        <?php echo $prefix . htmlspecialchars($chat['message']); ?>
+                    </div>
+
+                </div>
+
+                <?php if($chat['is_seen'] == 0 && $chat['receiver_id'] == $current_user): ?>
+                    <div class="unread-dot"></div>
+                <?php endif; ?>
+
+            </a>
+
+            <button 
+                class="delete-chat-btn"
+                data-product="<?php echo $chat['product_id']; ?>"
+                data-partner="<?php echo $chat['partner_id']; ?>"
+            >
+                <i class="fa-solid fa-trash"></i>
+            </button>
+
+        </div>
+
+    <?php endwhile; ?>
+
+<?php else: ?>
+
+    <div class="empty-state">
+        <i class="fa-regular fa-inbox"></i>
+        <h3>No active chats found</h3>
+        <p style="margin-top: 0.5rem;">
+            Conversations with other users will appear here.
+        </p>
+    </div>
+
+<?php endif; ?>
+
         </div>
     </div>
 </div>
@@ -279,57 +376,200 @@ $result = getLatestUserChats($conn, $current_user);
 <?php include __DIR__ . '/../../shared/components/footer.php'; ?>
 
 <script>
-    const inboxContainer = document.getElementById('inbox-list-container');
 
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
+const inboxContainer = document.getElementById('inbox-list-container');
 
-    function pollInboxUpdates() {
-        fetch('../modules/chat/inbox_data.php')
-            .then(response => response.json())
-            .then(data => {
+function escapeHtml(str) {
+
+    const div = document.createElement('div');
+
+    div.textContent = str;
+
+    return div.innerHTML;
+}
+
+function attachDeleteEvents() {
+
+    const deleteButtons = document.querySelectorAll('.delete-chat-btn');
+
+    deleteButtons.forEach(button => {
+
+        button.addEventListener('click', async (e) => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const confirmed = confirm(
+                "Delete this conversation?"
+            );
+
+            if (!confirmed) return;
+
+            const productId = button.dataset.product;
+            const partnerId = button.dataset.partner;
+
+            try {
+
+                const formData = new FormData();
+
+                formData.append('product_id', productId);
+                formData.append('partner_id', partnerId);
+
+                const response = await fetch(
+                    '../modules/chat/delete_chat.php',
+                    {
+                        method: 'POST',
+                        body: formData
+                    }
+                );
+
+                const data = await response.json();
+
                 if (data.status === 'success') {
-                    if (data.chats.length === 0) {
+
+                    const wrapper = button.closest('.chat-item-wrapper');
+
+                    if (wrapper) {
+                        wrapper.remove();
+                    }
+
+                    // show empty state if no chats left
+                    if (
+                        document.querySelectorAll('.chat-item-wrapper').length === 0
+                    ) {
+
                         inboxContainer.innerHTML = `
                             <div class="empty-state">
                                 <i class="fa-regular fa-inbox"></i>
                                 <h3>No active chats found</h3>
-                                <p style="margin-top: 0.5rem;">Conversations with other users will appear here.</p>
-                            </div>`;
-                        return;
+                                <p style="margin-top: 0.5rem;">
+                                    Conversations with other users will appear here.
+                                </p>
+                            </div>
+                        `;
                     }
-
-                    let htmlBuilder = '';
-                    data.chats.forEach(chat => {
-                        const initial = chat.partner_name.charAt(0);
-                        const unreadDot = chat.is_unread ? '<div class="unread-dot"></div>' : '';
-                        const prefix = chat.is_mine ? '<span class="my-prefix">You: </span>' : '';
-
-                        htmlBuilder += `
-                            <a href="chat.php?product_id=${chat.product_id}&receiver_id=${chat.partner_id}" class="chat-item">
-                                <div class="partner-avatar">${escapeHtml(initial)}</div>
-                                <div class="chat-info">
-                                    <div class="chat-meta">
-                                        <span class="partner-name">${escapeHtml(chat.partner_name)}</span>
-                                        <span class="product-tag">${escapeHtml(chat.product_title)}</span>
-                                    </div>
-                                    <div class="last-message">${prefix}${escapeHtml(chat.message)}</div>
-                                </div>
-                                ${unreadDot}
-                            </a>`;
-                    });
-                    inboxContainer.innerHTML = htmlBuilder;
-                    // Keep scroll position stable (no auto-jump)
                 }
-            })
-            .catch(error => console.error('Error fetching inbox updates:', error));
-    }
 
-    // Poll every 3 seconds
-    setInterval(pollInboxUpdates, 3000);
+            } catch (err) {
+
+                console.error(err);
+            }
+        });
+    });
+}
+
+function pollInboxUpdates() {
+
+    fetch('../modules/chat/inbox_data.php')
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            if (data.status === 'success') {
+
+                if (data.chats.length === 0) {
+
+                    inboxContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-regular fa-inbox"></i>
+                            <h3>No active chats found</h3>
+                            <p style="margin-top: 0.5rem;">
+                                Conversations with other users will appear here.
+                            </p>
+                        </div>
+                    `;
+
+                    return;
+                }
+
+                let htmlBuilder = '';
+
+                data.chats.forEach(chat => {
+
+                    const initial = chat.partner_name.charAt(0);
+
+                    const unreadDot = chat.is_unread
+                        ? '<div class="unread-dot"></div>'
+                        : '';
+
+                    const prefix = chat.is_mine
+                        ? '<span class="my-prefix">You: </span>'
+                        : '';
+
+                    htmlBuilder += `
+                    
+                    <div class="chat-item-wrapper">
+
+                        <a 
+                            href="chat.php?product_id=${chat.product_id}&receiver_id=${chat.partner_id}" 
+                            class="chat-link"
+                        >
+
+                            <div class="partner-avatar">
+                                ${escapeHtml(initial)}
+                            </div>
+
+                            <div class="chat-info">
+
+                                <div class="chat-meta">
+
+                                    <span class="partner-name">
+                                        ${escapeHtml(chat.partner_name)}
+                                    </span>
+
+                                    <span class="product-tag">
+                                        ${escapeHtml(chat.product_title)}
+                                    </span>
+
+                                </div>
+
+                                <div class="last-message">
+                                    ${prefix}${escapeHtml(chat.message)}
+                                </div>
+
+                            </div>
+
+                            ${unreadDot}
+
+                        </a>
+
+                        <button 
+                            class="delete-chat-btn"
+                            data-product="${chat.product_id}"
+                            data-partner="${chat.partner_id}"
+                        >
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+
+                    </div>
+                    `;
+                });
+
+                inboxContainer.innerHTML = htmlBuilder;
+
+                attachDeleteEvents();
+            }
+        })
+
+        .catch(error => {
+
+            console.error(
+                'Error fetching inbox updates:',
+                error
+            );
+        });
+}
+
+// INITIAL
+pollInboxUpdates();
+
+// DELETE BUTTONS
+attachDeleteEvents();
+
+// POLLING
+setInterval(pollInboxUpdates, 3000);
+
 </script>
 
 </body>
