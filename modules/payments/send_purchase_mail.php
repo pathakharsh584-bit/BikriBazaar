@@ -118,7 +118,16 @@ try {
     // =========================
     // BODY
     // =========================
+      
+$start_date = date(
+    'd M Y, h:i A',
+    strtotime($start_date)
+);
 
+$boost_expiry = date(
+    'd M Y, h:i A',
+    strtotime($boost_expiry)
+);
     $mail->Body = "
 
     <div style='
