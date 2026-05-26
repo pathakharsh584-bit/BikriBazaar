@@ -43,34 +43,39 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         try {
 
-            // SMTP CONFIGURATION
+    $mail->isSMTP();
+    $mail->Host = $_ENV['SMTP_HOST'];
+    $mail->SMTPAuth = true;
+    $mail->Username = $_ENV['SMTP_USERNAME'];
+    $mail->Password = $_ENV['SMTP_PASSWORD'];
 
-            $mail->isSMTP();
+    $encryption = $_ENV['SMTP_SECURE'];
 
-            $mail->Host = 'smtp.gmail.com';
+    if ($encryption === 'tls') {
 
-            $mail->SMTPAuth = true;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
-            $mail->Username = $_ENV['ADMIN_EMAIL'];
+    } elseif ($encryption === 'ssl') {
 
-            $mail->Password = $_ENV['ADMIN_APP_PASSWORD'];
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
 
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    } else {
 
-            $mail->Port = 587;
+        $mail->SMTPSecure = false;
+    }
 
-            // EMAIL DETAILS
+    $mail->Port = $_ENV['SMTP_PORT'];
 
-            $mail->setFrom(
-                $_ENV['ADMIN_EMAIL'],
-                'BikriBazaar'
-            );
+    $mail->setFrom(
+        $_ENV['SMTP_USERNAME'],
+        'BikriBazaar'
+    );
 
-            $mail->addAddress($email);
+    $mail->addAddress($email);
 
-            $mail->isHTML(true);
+    $mail->isHTML(true);
 
-            $mail->Subject = 'BikriBazaar Password Reset OTP';
+    $mail->Subject = 'BikriBazaar Password Reset OTP';
 
             $mail->Body = "
 

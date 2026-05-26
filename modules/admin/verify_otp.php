@@ -19,26 +19,33 @@ if (!isset($_SESSION['admin_otp'])) {
 
     $dotenv = parse_ini_file(__DIR__ . '/../../.env');
 
-    $adminEmail = $dotenv['ADMIN_EMAIL'];
-    $appPassword = $dotenv['ADMIN_APP_PASSWORD'];
+$adminEmail = $dotenv['SMTP_USERNAME'];
+$appPassword = $dotenv['SMTP_PASSWORD'];
 
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
     try {
+       $mail->isSMTP();
+       $mail->Host = $dotenv['SMTP_HOST'];
 
-        $mail->isSMTP();
+$mail->SMTPAuth = true;
 
-        $mail->Host = 'smtp.gmail.com';
+$mail->Username = $adminEmail;
 
-        $mail->SMTPAuth = true;
+$mail->Password = $appPassword;
 
-        $mail->Username = $adminEmail;
+if ($dotenv['SMTP_SECURE'] === 'tls') {
 
-        $mail->Password = $appPassword;
+    $mail->SMTPSecure =
+        PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
 
-        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+} elseif ($dotenv['SMTP_SECURE'] === 'ssl') {
 
-        $mail->Port = 587;
+    $mail->SMTPSecure =
+        PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+}
+
+$mail->Port = $dotenv['SMTP_PORT'];
 
         $mail->setFrom($adminEmail, 'BikriBazaar Admin');
 
