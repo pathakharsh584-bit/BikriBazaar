@@ -467,7 +467,7 @@
 
     <div class="nav-right">
 
-        <a href="<?php echo BASE_URL; ?>/public/index.php" class="home-btn">
+        <a href="<?php echo BASE_URL; ?>index.php" class="home-btn">
             <i class="fa-solid fa-house"></i>
             Home
         </a>

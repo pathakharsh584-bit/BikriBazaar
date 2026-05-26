@@ -99,6 +99,14 @@ try {
             'Your Boost Plan Will Expire Soon';
     }
 
+
+     date_default_timezone_set('Asia/Kolkata');
+
+$boost_expiry = date(
+    'd M Y, h:i A',
+    strtotime($boost_expiry)
+);
+
     $mail->Body = "
 
     <div style='

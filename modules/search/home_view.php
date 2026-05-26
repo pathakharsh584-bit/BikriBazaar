@@ -373,33 +373,34 @@ while($normal_index < count($normal_products)){
 
     // PROMOTIONAL INJECTION
 
-    if($cycle % 6 <= 2){
+$injected = false;
 
-        if(isset($premium_products[$premium_index])){
+// 1. PREMIUM FIRST
+if(isset($premium_products[$premium_index])){
 
-            $final_feed[] = $premium_products[$premium_index];
+    $final_feed[] = $premium_products[$premium_index];
+    $premium_index++;
 
-            $premium_index++;
-        }
+    $injected = true;
+}
 
-    }elseif($cycle % 6 <= 4){
+// 2. IF NO PREMIUM → SPECIAL
+if(!$injected && isset($special_products[$special_index])){
 
-        if(isset($special_products[$special_index])){
+    $final_feed[] = $special_products[$special_index];
+    $special_index++;
 
-            $final_feed[] = $special_products[$special_index];
+    $injected = true;
+}
 
-            $special_index++;
-        }
+// 3. IF NO SPECIAL → BASIC
+if(!$injected && isset($basic_products[$basic_index])){
 
-    }else{
+    $final_feed[] = $basic_products[$basic_index];
+    $basic_index++;
 
-        if(isset($basic_products[$basic_index])){
-
-            $final_feed[] = $basic_products[$basic_index];
-
-            $basic_index++;
-        }
-    }
+    $injected = true;
+}
 
     $cycle++;
 }
