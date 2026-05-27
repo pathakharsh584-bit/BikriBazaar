@@ -5,6 +5,7 @@ session_start();
 // 1. Include config FIRST to load Cloudinary environment and the BASE_URL constant
 require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/db.php';
+require_once __DIR__ . '/../../shared/activity_log.php';
 
 use Cloudinary\Api\Upload\UploadApi;
 
@@ -31,6 +32,20 @@ if(isset($_GET['id'])){
 
     $product_id = intval($_GET['id']);
     $user_id = intval($_SESSION['user_id']);
+
+    $user_query = mysqli_query(
+
+    $conn,
+
+    "SELECT name
+     FROM users
+     WHERE id = $user_id"
+
+);
+
+$user = mysqli_fetch_assoc($user_query);
+
+$user_name = $user['name'] ?? 'Unknown User';
 
     // STEP 1: Fetch all associated image paths (which are now Cloudinary URLs)
     $img_sql = "SELECT pi.image_path 
@@ -65,12 +80,36 @@ if(isset($_GET['id'])){
         // STEP 3: Delete the product from the database
         // Note: This assumes your DB has 'ON DELETE CASCADE' set up for product_images.
         // If not, you should run a query to DELETE FROM product_images first!
+
+$product_query = mysqli_query(
+
+    $conn,
+
+    "SELECT title
+     FROM products
+     WHERE id = $product_id"
+
+);
+
+$product = mysqli_fetch_assoc($product_query);
+
+$product_title = $product['title'] ?? 'Unknown Product';
+
         $del_sql = "DELETE FROM products WHERE id = ? AND user_id = ?";
         $del_stmt = mysqli_prepare($conn, $del_sql);
         
         if ($del_stmt) {
             mysqli_stmt_bind_param($del_stmt, 'ii', $product_id, $user_id);
             mysqli_stmt_execute($del_stmt);
+            logActivity(
+
+    $conn,
+
+    'delete_product',
+
+    "$user_name deleted ad: $product_title"
+
+);
             mysqli_stmt_close($del_stmt);
         }
     }

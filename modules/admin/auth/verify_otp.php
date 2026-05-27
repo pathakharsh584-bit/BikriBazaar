@@ -1,6 +1,7 @@
 <?php
-
-require_once __DIR__ . '/../../shared/config.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require_once __DIR__ . '/../../../shared/config.php';
 
 session_start();
 
@@ -15,18 +16,19 @@ if (!isset($_SESSION['admin_otp'])) {
 
     $_SESSION['admin_otp'] = rand(100000, 999999);
 
-    require_once __DIR__ . '/../../vendor/autoload.php';
+    require_once __DIR__ . '/../../../vendor/autoload.php';
 
-    $dotenv = parse_ini_file(__DIR__ . '/../../.env');
+    $dotenv = parse_ini_file(__DIR__ . '/../../../.env');
 
 $adminEmail = $dotenv['SMTP_USERNAME'];
 $appPassword = $dotenv['SMTP_PASSWORD'];
 
-    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+$mail = new PHPMailer(true);
 
     try {
        $mail->isSMTP();
-       $mail->Host = $dotenv['SMTP_HOST'];
+
+$mail->Host = 'smtp.gmail.com';
 
 $mail->SMTPAuth = true;
 
@@ -34,17 +36,24 @@ $mail->Username = $adminEmail;
 
 $mail->Password = $appPassword;
 
-if ($dotenv['SMTP_SECURE'] === 'tls') {
+$mail->SMTPSecure =
+    PHPMailer::ENCRYPTION_SMTPS;
 
-    $mail->SMTPSecure =
-        PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+$mail->Port = 465;
 
-} elseif ($dotenv['SMTP_SECURE'] === 'ssl') {
+$mail->SMTPOptions = [
 
-    $mail->SMTPSecure =
-        PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-}
+    'ssl' => [
 
+        'verify_peer' => false,
+
+        'verify_peer_name' => false,
+
+        'allow_self_signed' => true
+
+    ]
+
+];
 $mail->Port = $dotenv['SMTP_PORT'];
 
         $mail->setFrom($adminEmail, 'BikriBazaar Admin');
@@ -101,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['admin_temp_auth']);
         unset($_SESSION['admin_otp']);
 
-        header("Location: " . BASE_URL . "admin_view.php");
+        header("Location: " . BASE_URL . "admin_page.php");
         exit();
 
     } else {

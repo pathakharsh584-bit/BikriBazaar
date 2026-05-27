@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../../shared/config.php';
+require_once __DIR__ . '/../../shared/activity_log.php';
 use Cloudinary\Api\Upload\UploadApi;
 
 function postProduct($conn)
@@ -27,6 +28,30 @@ function postProduct($conn)
         
         // STEP 2: Grab the ID of the product we literally just created
         $product_id = mysqli_insert_id($conn);
+
+        $user_query = mysqli_query(
+
+    $conn,
+
+    "SELECT name
+     FROM users
+     WHERE id = $user_id"
+
+);
+
+$user = mysqli_fetch_assoc($user_query);
+
+$user_name = $user['name'] ?? 'Unknown User';
+
+logActivity(
+
+    $conn,
+
+    'post_product',
+
+    "$user_name posted a new ad: $title"
+
+);
 
         // STEP 3: Handle Multiple Image Uploads to Cloudinary
         if(isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {

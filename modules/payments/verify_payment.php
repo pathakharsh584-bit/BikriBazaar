@@ -7,6 +7,7 @@ session_start();
 
 require_once __DIR__ . '/../../shared/config.php';
 require_once __DIR__ . '/../../shared/db.php';
+require_once __DIR__ . '/../../shared/activity_log.php';
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -231,6 +232,44 @@ try {
     );
 
     $insert_stmt->execute();
+
+    $product_query = mysqli_query(
+
+    $conn,
+
+    "SELECT title
+     FROM products
+     WHERE id = $product_id"
+
+);
+
+$product = mysqli_fetch_assoc($product_query);
+
+$product_title = $product['title'] ?? 'Unknown Product';
+
+$user_query = mysqli_query(
+
+    $conn,
+
+    "SELECT name
+     FROM users
+     WHERE id = $user_id"
+
+);
+
+$user = mysqli_fetch_assoc($user_query);
+
+$user_name = $user['name'] ?? 'Unknown User';
+
+logActivity(
+
+    $conn,
+
+    'boost_product',
+
+    "$user_name boosted ad: $product_title ($plan_name Plan)"
+
+);
 
     // =========================
     // COMMIT
