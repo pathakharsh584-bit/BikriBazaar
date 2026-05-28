@@ -1,9 +1,5 @@
 <?php
 
-session_start();
-
-require_once __DIR__ . '/../../../shared/config.php';
-
 require_once __DIR__ . '/../../../shared/db.php';
 
 if(!isset($_GET['id'])){
@@ -36,18 +32,11 @@ mysqli_query(
 
 );
 
-/* REDIRECT */
-
-header(
-
-    "Location: " .
-
-    BASE_URL .
-
-    "admin_page.php?page=reported_ads"
-
-);
-
-exit();
-
 ?>
+
+<script>
+
+window.location.href =
+'admin_page.php?page=reported_ads';
+
+</script>

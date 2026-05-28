@@ -68,12 +68,12 @@ require_once __DIR__ . '/reported_ads_data.php';
 
                     <td>
 
-                        <a href="./reported_ads/delete_reported_ad.php?id=<?php echo $report['product_id']; ?>"
-                           class="delete-btn">
+                        <a href="admin_page.php?page=delete_reported_ad&id=<?php echo $report['product_id']; ?>"
+   class="delete-btn">
 
-                            Delete
+    Delete
 
-                        </a>
+</a>
 
                     </td>
 

@@ -91,6 +91,14 @@ case 'settings':
     require_once __DIR__ . '/reported_ads/reported_ads_view.php';
     break;
 
+case 'delete_reported_ad':
+    require_once __DIR__ . '/reported_ads/delete_reported_ad.php';
+    break;
+
+    case 'delete_user':
+    require_once __DIR__ . '/users/delete_user.php';
+    break;
+
     default:
         require_once __DIR__ . '/dashboard/dashboard_view.php';
         break;
