@@ -256,3 +256,53 @@ if(editForm){
     });
 
 }
+/* RECENT ACTIVITIES AJAX */
+
+function loadRecentActivities(){
+
+    const activityBox =
+
+    document.getElementById(
+        "recentActivities"
+    );
+
+    if(!activityBox) return;
+
+    fetch(
+
+        "./../modules/admin/activity_logs/fetch_recent_activities.php"
+
+    )
+
+    .then(response => response.text())
+
+    .then(data => {
+
+        activityBox.innerHTML = data;
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Activity AJAX Error:",
+            error
+        );
+
+    });
+
+}
+
+/* INITIAL LOAD */
+
+loadRecentActivities();
+
+/* AUTO REFRESH */
+
+setInterval(
+
+    loadRecentActivities,
+
+    5000
+
+);

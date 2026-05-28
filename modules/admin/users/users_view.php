@@ -87,10 +87,6 @@
 
                     <div class="action-buttons">
 
-                        <button class="edit-btn">
-                            <i class="fa-solid fa-user-pen"></i>
-                        </button>
-
                         <button class="delete-btn">
                             <i class="fa-solid fa-user-slash"></i>
                         </button>

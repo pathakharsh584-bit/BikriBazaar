@@ -61,6 +61,39 @@ if(isset($_SESSION['user_id'])){
 
 $current_category = mysqli_real_escape_string($conn, $product['category']);
 
+/* REPORT CHECK */
+
+$is_reported = false;
+
+if(isset($_SESSION['user_id'])){
+
+    $current_user_id = intval($_SESSION['user_id']);
+
+    $report_check = mysqli_query(
+
+        $conn,
+
+        "SELECT id
+         FROM reported_ads
+
+         WHERE
+
+         product_id = $product_id
+
+         AND
+
+         user_id = $current_user_id"
+
+    );
+
+    if(mysqli_num_rows($report_check) > 0){
+
+        $is_reported = true;
+
+    }
+
+}
+
 // Fetch related ads (same category, active status, exclude current product)
 $related_sql = "
     SELECT p.*, 
@@ -387,6 +420,185 @@ $related_result = mysqli_query($conn, $related_sql);
                 height: 300px;
             }
         }
+        /* REPORT AD BUTTON */
+
+.report-btn{
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 14px;
+
+    margin-top: 10px;
+
+    border-radius: 50px;
+
+    background: linear-gradient(
+        135deg,
+        #1a3fc4 0%,
+        #0ea5a0 100%
+    );
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.25s ease;
+
+    border: none;
+
+}
+
+/* HOVER EFFECT */
+
+.report-btn:hover{
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 20px rgba(239,68,68,0.15);
+
+}
+
+/* REPORTED BUTTON */
+
+.reported-btn{
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 14px;
+
+    margin-top: 10px;
+
+    border-radius: 50px;
+
+    background: #e5e7eb;
+
+    color: #6b7280;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    border: none;
+
+    cursor: not-allowed;
+
+    opacity: 0.95;
+
+}
+/* REPORT BOX */
+
+.report-box{
+
+    display: none;
+
+    margin-top: 12px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 20px;
+
+    padding: 16px;
+
+    animation: fadeIn 0.25s ease;
+
+}
+
+.report-box.active{
+
+    display: block;
+
+}
+
+.report-box select{
+
+    width: 100%;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    border: 1px solid #d1d5db;
+
+    margin-bottom: 12px;
+
+    outline: none;
+
+}
+
+.submit-report-btn{
+
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 40px;
+
+    background: #dc2626;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+
+}
+
+.submit-report-btn:hover{
+
+    background: #b91c1c;
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity: 0;
+
+        transform: translateY(-5px);
+
+    }
+
+    to{
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
     </style>
 </head>
 <body>
@@ -461,6 +673,63 @@ $related_result = mysqli_query($conn, $related_sql);
                 <a href="chat.php?product_id=<?php echo $product['id']; ?>&receiver_id=<?php echo $product['user_id']; ?>" class="action-btn btn-chat">
                     <i class="fa-solid fa-comment"></i> Chat with Seller
                 </a>
+                 <?php if($is_reported): ?>
+
+    <button
+        class="action-btn reported-btn"
+        disabled>
+
+        ✅ REPORTED
+
+    </button>
+
+<?php else: ?>
+
+   <button
+    class="action-btn report-btn"
+    onclick="toggleReportBox()">
+
+    🚨 Report Ad
+
+</button>
+
+<div
+    id="reportBox"
+    class="report-box">
+
+    <form method="POST"
+          action="../modules/products/report-ad_controller.php?id=<?php echo $product['id']; ?>">
+
+        <select
+            name="reason"
+            required>
+
+            <option value="">
+                Select Reason
+            </option>
+
+            <option value="Scam">
+                Scam
+            </option>
+
+            <option value="Fake Product">
+                Fake Product
+            </option>
+
+        </select>
+
+        <button
+            type="submit"
+            class="submit-report-btn">
+
+            Submit Report
+
+        </button>
+
+    </form>
+
+</div>
+<?php endif; ?>
             <?php endif; ?>
         </div>
 
@@ -575,6 +844,14 @@ $related_result = mysqli_query($conn, $related_sql);
             btn.className = originalClass;
         });
     }
+    function toggleReportBox(){
+
+    document
+        .getElementById('reportBox')
+        .classList
+        .toggle('active');
+
+}
 </script>
 
 </body>
