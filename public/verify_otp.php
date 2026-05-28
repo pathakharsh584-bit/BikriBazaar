@@ -1,3 +1,3 @@
 <?php
-require_once '../modules/admin/verify_otp.php';
+require_once '../modules/admin/auth/verify_otp.php';
 ?>

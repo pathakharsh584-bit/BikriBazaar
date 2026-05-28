@@ -53,3 +53,4 @@ $folder_name = str_replace($doc_root, '', $project_path);
 define('BASE_URL', $protocol . '://' . $host . $folder_name . '/public/');
 
 ?>
+

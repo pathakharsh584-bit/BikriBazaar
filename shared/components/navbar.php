@@ -15,7 +15,23 @@ require_once __DIR__ . '/../config.php';
         --muted: #6b7280;
         --border: #dde4f5;
     }
+/* THEME BUTTON */
 
+.theme-toggle-btn{
+
+    border: none;
+
+    background: #f3f4f6;
+
+    padding: 8px 12px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+}
     /* ── NAVBAR ── */
     .navbar {
         background: #ffffff;
@@ -224,6 +240,50 @@ require_once __DIR__ . '/../config.php';
         z-index: 10;
         pointer-events: none; /* Ensures the badge doesn't interrupt the hover dropdown */
     }
+
+    /* DARK MODE */
+
+body.dark{
+
+    background: #0f172a !important;
+
+    color: white !important;
+
+}
+
+body.dark .navbar{
+
+    background: #111827 !important;
+
+    border-color: #374151 !important;
+
+}
+
+body.dark .dropdown-content{
+
+    background: #1f2937 !important;
+
+}
+
+body.dark .dropdown-content a{
+
+    color: white !important;
+
+}
+
+body.dark .nav-links a{
+
+    color: white !important;
+
+}
+
+body.dark .theme-toggle-btn{
+
+    background: #374151 !important;
+
+    color: white !important;
+
+}
     /* Responsive */
     @media (max-width: 768px) {
         .navbar { padding: 0 1rem; }
@@ -239,7 +299,13 @@ require_once __DIR__ . '/../config.php';
         Bikri<span>Bazaar</span>
     </div>
 
+
     <div class="nav-links">
+
+    <button id="themeToggle"
+            class="theme-toggle-btn">
+            🌙
+        </button>
         <a href="index.php"><i class="fa-solid fa-house"></i> Home</a>
 
         <?php if(isset($_SESSION['user_id'])): ?>
@@ -379,4 +445,57 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateUnreadCount, 3000);
 
 });
+</script>
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const themeToggle = document.getElementById('themeToggle');
+
+    const savedTheme = localStorage.getItem('theme');
+
+    // LOAD SAVED THEME
+
+    if(savedTheme === 'dark'){
+
+        document.body.classList.add('dark');
+
+        if(themeToggle){
+
+            themeToggle.innerHTML = '☀️';
+
+        }
+
+    }
+
+    // TOGGLE THEME
+
+    if(themeToggle){
+
+        themeToggle.addEventListener('click', () => {
+
+            document.body.classList.toggle('dark');
+
+            if(document.body.classList.contains('dark')){
+
+                localStorage.setItem('theme', 'dark');
+
+                themeToggle.innerHTML = '☀️';
+
+            }
+
+            else{
+
+                localStorage.setItem('theme', 'light');
+
+                themeToggle.innerHTML = '🌙';
+
+            }
+
+        });
+
+    }
+
+});
+
 </script>

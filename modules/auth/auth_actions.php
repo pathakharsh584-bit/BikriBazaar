@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../../shared/activity_log.php';
+
 function validatePassword($password)
 {
     if(strlen($password) < 8){
@@ -65,6 +67,15 @@ function registerUser($conn)
             VALUES('$name','$email','$hashedPassword','$phone','$city')";
 
     if(mysqli_query($conn, $sql)){
+        logActivity(
+
+    $conn,
+
+    'register',
+
+    "$name created a new account"
+
+);
         $msg = "Registration Successful!";
         if($is_ajax) { 
             // After registration, we usually want them to log in

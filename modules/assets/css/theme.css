@@ -1,0 +1,52 @@
+/* GLOBAL DARK MODE */
+
+body.dark{
+
+    background: #0f172a !important;
+
+    color: white !important;
+
+}
+
+body.dark .navbar,
+body.dark .footer,
+body.dark .product-card,
+body.dark .category-card,
+body.dark .search-form,
+body.dark .filter-panel,
+body.dark .city-chip,
+body.dark .tips-strip{
+
+    background: #1f2937 !important;
+
+    color: white !important;
+
+    border-color: #374151 !important;
+
+}
+
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark h5,
+body.dark p,
+body.dark span,
+body.dark a,
+body.dark label{
+
+    color: white !important;
+
+}
+
+body.dark input,
+body.dark select,
+body.dark textarea{
+
+    background: #374151 !important;
+
+    color: white !important;
+
+    border: 1px solid #4b5563 !important;
+
+}
