@@ -88,7 +88,8 @@
                     <div class="action-buttons">
 
     <a href="admin_page.php?page=delete_user&id=<?php echo $user['id']; ?>"
-       class="delete-btn">
+       class="delete-btn"
+       onclick=" event.stopImmediatePropagation(); return confirm('Are you sure you want to delete this user and all of their ads? This action cannot be undone.');">
 
         <i class="fa-solid fa-user-slash"></i>
 

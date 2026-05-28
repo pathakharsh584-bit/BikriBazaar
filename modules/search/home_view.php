@@ -23,7 +23,7 @@ $sql = "SELECT products.*,
         END as plan_badge
 
         FROM products 
-        WHERE `status` = 'active'";
+        WHERE `status` = 'active' AND `is_deleted` = 0";
 
 // Fetch distinct cities for the dynamic dropdown filter
 $city_sql = "SELECT DISTINCT city FROM products WHERE city IS NOT NULL AND city != ''";
@@ -214,7 +214,7 @@ SELECT products.*,
 
 FROM products
 
-WHERE status='active'
+WHERE status='active' AND is_deleted = 0
 
 AND (
     boost_type IS NULL
@@ -253,7 +253,7 @@ SELECT products.*,
 
 FROM products
 
-WHERE status='active'
+WHERE status='active' AND is_deleted = 0
 
 AND LOWER(boost_type)='premium'
 
@@ -290,7 +290,7 @@ SELECT products.*,
 
 FROM products
 
-WHERE status='active'
+WHERE status='active' AND is_deleted = 0
 
 AND LOWER(boost_type)='special'
 
@@ -327,7 +327,7 @@ SELECT products.*,
 
 FROM products
 
-WHERE status='active'
+WHERE status='active' AND is_deleted = 0
 
 AND LOWER(boost_type)='basic'
 

@@ -41,6 +41,14 @@ require_once __DIR__ . '/reported_ads_data.php';
             <?php while($report = mysqli_fetch_assoc($reports_query)): ?>
 
                 <tr>
+                    <td>
+                        <?php 
+                            $displayImage = !empty($report['image']) ? $report['image'] : BASE_URL . 'assets/images/default-placeholder.png';
+                        ?>
+                        <img src="<?php echo htmlspecialchars($displayImage); ?>" 
+                             alt="Ad Image" 
+                             style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    </td>
 
                     <td>
 

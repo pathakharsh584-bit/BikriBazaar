@@ -77,6 +77,7 @@
 
                 <tr>
                     <th>ID</th>
+                    <th>Image</th>
                     <th>Product</th>
                     <th>Seller</th>
                     <th>Category</th>
@@ -115,6 +116,16 @@
                 <td>
                     #AD<?php echo $ad['id']; ?>
                 </td>
+
+                <td>
+        <?php 
+            // Fallback to placeholder if Cloudinary image is missing
+            $displayImage = !empty($ad['image']) ? $ad['image'] : BASE_URL . 'assets/images/default-placeholder.png';
+        ?>
+        <img src="<?php echo htmlspecialchars($displayImage); ?>" 
+             alt="Ad Image" 
+             style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
+    </td>
 
                 <td>
                     <?php echo htmlspecialchars($ad['title']); ?>

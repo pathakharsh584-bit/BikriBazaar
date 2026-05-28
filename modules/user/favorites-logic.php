@@ -30,7 +30,7 @@ $sql = "SELECT products.*,
         (SELECT image_path FROM product_images WHERE product_id = products.id ORDER BY id ASC LIMIT 1) as image
         FROM favorites
         INNER JOIN products ON favorites.product_id = products.id
-        WHERE favorites.user_id = ?
+        WHERE favorites.user_id = ? AND products.is_deleted = 0
         ORDER BY favorites.id DESC";
 
 $stmt = mysqli_prepare($conn, $sql);
