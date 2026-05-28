@@ -166,25 +166,6 @@
 
                     <div class="action-buttons">
 
-                       <button 
-
-    class="edit-btn"
-
-    data-id="<?php echo $ad['id']; ?>"
-
-    data-title="<?php echo htmlspecialchars($ad['title']); ?>"
-
-    data-price="<?php echo $ad['price']; ?>"
-
-    data-category="<?php echo htmlspecialchars($ad['category']); ?>"
-
-    data-status="<?php echo $ad['status']; ?>"
-
-    data-boost="<?php echo $ad['boost_type'] ?? 'basic'; ?>"
-
->
-    <i class="fa-solid fa-pen"></i>
-</button>
 
                         <button 
                             class="delete-btn"

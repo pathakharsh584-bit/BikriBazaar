@@ -318,9 +318,7 @@
 
     <div class="action-buttons">
 
-        <button class="edit-btn">
-            <i class="fa-solid fa-pen"></i>
-        </button>
+      
 
         <button 
             class="delete-btn"
