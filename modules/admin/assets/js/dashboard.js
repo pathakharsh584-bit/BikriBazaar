@@ -121,3 +121,77 @@ if(ctx){
     });
 
 }
+
+function toggleGuideBox(){
+
+    const guideBox =
+
+    document.getElementById(
+        'guideBox'
+    );
+
+    const guideMessages =
+
+    document.getElementById(
+        'guideMessages'
+    );
+
+    guideBox.classList.toggle(
+        'active'
+    );
+
+    if(
+
+        !guideMessages.dataset.loaded
+
+    ){
+
+        setTimeout(() => {
+
+            guideMessages.innerHTML = `
+
+                <div class="guide-msg">
+
+                    👋 Welcome Admin!
+
+                </div>
+
+                <div class="guide-msg">
+
+                    • Monitor reported ads regularly
+
+                </div>
+
+                <div class="guide-msg">
+
+                    • Remove fake/scam products quickly
+
+                </div>
+
+                <div class="guide-msg">
+
+                    • Review premium promotions daily
+
+                </div>
+
+                <div class="guide-msg">
+
+                    • Keep categories clean & updated
+
+                </div>
+
+                <div class="guide-msg">
+
+                    • Track user activities carefully
+
+                </div>
+
+            `;
+
+        }, 1800);
+
+        guideMessages.dataset.loaded = true;
+
+    }
+
+}

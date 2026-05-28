@@ -65,10 +65,6 @@
 
         </form>
 
-        <button class="view-all-btn">
-            Add New
-        </button>
-
     </div>
 
 </div>
@@ -170,25 +166,6 @@
 
                     <div class="action-buttons">
 
-                       <button 
-
-    class="edit-btn"
-
-    data-id="<?php echo $ad['id']; ?>"
-
-    data-title="<?php echo htmlspecialchars($ad['title']); ?>"
-
-    data-price="<?php echo $ad['price']; ?>"
-
-    data-category="<?php echo htmlspecialchars($ad['category']); ?>"
-
-    data-status="<?php echo $ad['status']; ?>"
-
-    data-boost="<?php echo $ad['boost_type'] ?? 'basic'; ?>"
-
->
-    <i class="fa-solid fa-pen"></i>
-</button>
 
                         <button 
                             class="delete-btn"
@@ -245,110 +222,6 @@
     <?php endif; ?>
 
 </div>
-
-    </div>
-
-</div>
-<!-- EDIT PRODUCT MODAL -->
-
-<div class="modal-overlay" id="editModal">
-
-    <div class="edit-modal">
-
-        <div class="modal-header">
-
-            <h3>Edit Product</h3>
-
-            <button class="close-modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-        </div>
-
-        <form id="editProductForm">
-
-            <input type="hidden" name="product_id" id="editProductId">
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>Product Title</label>
-
-                    <input 
-                        type="text"
-                        name="title"
-                        id="editTitle"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Price</label>
-
-                    <input 
-                        type="number"
-                        name="price"
-                        id="editPrice"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Category</label>
-
-                    <input 
-                        type="text"
-                        name="category"
-                        id="editCategory"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Status</label>
-
-                    <select name="status" id="editStatus">
-
-                        <option value="active">Active</option>
-
-                        <option value="sold">Sold</option>
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Boost Type</label>
-
-                    <select name="boost_type" id="editBoost">
-
-    <option value="">No Plan</option>
-
-    <option value="basic">Basic</option>
-
-    <option value="special">Special</option>
-
-    <option value="premium">Premium</option>
-
-</select>
-
-                </div>
-
-            </div>
-
-            <button type="submit" class="save-btn">
-                Save Changes
-            </button>
-
-        </form>
 
     </div>
 

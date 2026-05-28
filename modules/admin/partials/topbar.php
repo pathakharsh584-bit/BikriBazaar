@@ -3,14 +3,19 @@
     <div class="topbar-left">
 
         <button class="menu-toggle">
+
             <i class="fa-solid fa-bars"></i>
+
         </button>
 
         <div class="search-box">
 
             <i class="fa-solid fa-magnifying-glass"></i>
 
-            <input type="text" placeholder="Search anything...">
+            <input
+                type="text"
+                placeholder="Search anything..."
+            >
 
         </div>
 
@@ -18,72 +23,40 @@
 
     <div class="topbar-right">
 
-        <div class="notification-wrapper">
+        <!-- GUIDE BUTTON -->
 
-    <button class="topbar-icon notification-btn">
+      <button
+    class="topbar-icon"
+    onclick="document.getElementById('guideBox').classList.toggle('active')">
 
-        <i class="fa-regular fa-bell"></i>
+    <i class="fa-solid fa-lightbulb"></i>
 
-        <span class="notification-dot"></span>
+</button>
 
-    </button>
-
-    <div class="notification-dropdown">
-
-        <h4>Notifications</h4>
-
-        <?php
-
-        require_once __DIR__ . '/../../../shared/db.php';
-
-        $notification_query = mysqli_query(
-
-            $conn,
-
-            "SELECT *
-             FROM activity_logs
-             ORDER BY created_at DESC
-             LIMIT 5"
-
-        );
-
-        while($notification = mysqli_fetch_assoc($notification_query)):
-
-        ?>
-
-            <div class="notification-item">
-
-                <?php
-
-                echo htmlspecialchars(
-
-                    $notification['activity_message']
-
-                );
-
-                ?>
-
-            </div>
-
-        <?php endwhile; ?>
-
-    </div>
-
-</div>
-
-        <button class="topbar-icon">
-            <i class="fa-regular fa-envelope"></i>
-        </button>
+        <!-- PROFILE -->
 
         <div class="topbar-profile">
 
             <div class="profile-avatar">
-                H
+
+                👨‍💼
+
             </div>
 
             <div class="profile-info">
-                <h4>Super Admin</h4>
-                <p>Administrator</p>
+
+                <h4>
+
+                    Super Admin
+
+                </h4>
+
+                <p>
+
+                    Administrator
+
+                </p>
+
             </div>
 
             <i class="fa-solid fa-chevron-down"></i>
@@ -93,3 +66,78 @@
     </div>
 
 </div>
+<div
+    id="guideBox"
+    class="guide-box">
+
+    <div class="guide-header">
+
+        💡 Admin Assistant
+
+    </div>
+
+    <div
+        class="guide-messages"
+        id="guideMessages">
+
+        <div class="typing">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+setTimeout(() => {
+
+    document.getElementById(
+        'guideMessages'
+    ).innerHTML = `
+
+        <div class="guide-msg">
+
+            👋 Welcome Admin!
+
+        </div>
+
+        <div class="guide-msg">
+
+            • Monitor reported ads regularly
+
+        </div>
+
+        <div class="guide-msg">
+
+            • Remove fake/scam ads quickly
+
+        </div>
+
+        <div class="guide-msg">
+
+            • Review premium promotions daily
+
+        </div>
+
+        <div class="guide-msg">
+
+            • Keep categories updated
+
+        </div>
+
+        <div class="guide-msg">
+
+            • Track user activities carefully
+
+        </div>
+
+    `;
+
+}, 1800);
+
+</script>

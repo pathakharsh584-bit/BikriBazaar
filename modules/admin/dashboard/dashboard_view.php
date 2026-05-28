@@ -122,30 +122,18 @@
 
 </div>
 
-          <div class="activity-list"
-                id="recentActivities"></div>
+         <div class="activity-list"
+    id="recentActivities">
 
-    <?php while($activity = mysqli_fetch_assoc($recent_activity_query)): ?>
-
-        <div class="activity-item">
-
-            <div class="activity-dot"></div>
-
-            <p>
-
-                <?php echo htmlspecialchars(
-                    $activity['activity_message']
-                ); ?>
-
-            </p>
-
-        </div>
-        <div class="card-header">
-
+    <!-- activities -->
 
 </div>
 
-    <?php endwhile; ?>
+<div
+    class="activity-list"
+    id="recentActivities">
+
+</div>
 
 </div>
 
@@ -330,9 +318,7 @@
 
     <div class="action-buttons">
 
-        <button class="edit-btn">
-            <i class="fa-solid fa-pen"></i>
-        </button>
+      
 
         <button 
             class="delete-btn"

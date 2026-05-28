@@ -87,15 +87,14 @@
 
                     <div class="action-buttons">
 
-                        <button class="edit-btn">
-                            <i class="fa-solid fa-user-pen"></i>
-                        </button>
+    <a href="admin_page.php?page=delete_user&id=<?php echo $user['id']; ?>"
+       class="delete-btn">
 
-                        <button class="delete-btn">
-                            <i class="fa-solid fa-user-slash"></i>
-                        </button>
+        <i class="fa-solid fa-user-slash"></i>
 
-                    </div>
+    </a>
+
+</div>
 
                 </td>
 

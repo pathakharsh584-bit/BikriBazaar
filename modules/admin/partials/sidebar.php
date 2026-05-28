@@ -77,12 +77,16 @@ $current_page = $_GET['page'] ?? 'dashboard';
     <span>Categories</span>
 </a>
 
-        <p class="menu-title system-title">SYSTEM</p>
+<a href="admin_page.php?page=reported_ads"
+   class="sidebar-link">
 
-        <a href="#" class="menu-item">
-            <i class="fa-solid fa-bell"></i>
-            <span>Notifications</span>
-        </a>
+    <i class="fa-solid fa-triangle-exclamation"></i>
+
+    <span>Reported Ads</span>
+
+</a>
+
+        <p class="menu-title system-title">SYSTEM</p>
 
         <a 
     href="./admin_page.php?page=settings"class="menu-item <?php echo $current_page === 'settings' ? 'active' : ''; ?>"
@@ -106,7 +110,11 @@ $current_page = $_GET['page'] ?? 'dashboard';
         <div class="admin-profile">
 
             <div class="admin-avatar">
-                H
+               <div class="profile-avatar">
+
+    <i class="fa-solid fa-user-shield"></i>
+
+</div>
             </div>
 
             <div class="admin-info">

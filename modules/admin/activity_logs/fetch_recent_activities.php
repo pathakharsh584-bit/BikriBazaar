@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../../../shared/db.php';
 
-$activity_query = mysqli_query(
+$query = mysqli_query(
 
     $conn,
 
@@ -13,31 +13,22 @@ $activity_query = mysqli_query(
 
 );
 
-while($activity = mysqli_fetch_assoc($activity_query)){
+while($activity = mysqli_fetch_assoc($query)):
 
 ?>
 
 <div class="activity-item">
 
-    <div class="activity-dot"></div>
+    <span class="activity-dot"></span>
 
-    <p>
+    <?php
 
-        <?php
+    echo htmlspecialchars(
+        $activity['activity_message']
+    );
 
-        echo htmlspecialchars(
-
-            $activity['activity_message']
-
-        );
-
-        ?>
-
-    </p>
+    ?>
 
 </div>
 
-<?php
-
-}
-?>
+<?php endwhile; ?>
