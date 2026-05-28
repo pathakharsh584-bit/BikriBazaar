@@ -33,7 +33,7 @@ mysqli_stmt_close($unread_stmt);
 $sql = "SELECT products.*, 
         (SELECT image_path FROM product_images WHERE product_id = products.id ORDER BY id ASC LIMIT 1) as image 
         FROM products 
-        WHERE user_id = ? 
+        WHERE user_id = ? AND is_deleted = 0
         ORDER BY id DESC";
 
 $stmt = mysqli_prepare($conn, $sql);
