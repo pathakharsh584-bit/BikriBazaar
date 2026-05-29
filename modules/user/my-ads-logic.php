@@ -85,7 +85,7 @@ $total_ads = count($products);
             color: var(--text);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;  /* for sticky footer */
+            flex-direction: column;  
         }
 
         a { text-decoration: none; color: inherit; }
