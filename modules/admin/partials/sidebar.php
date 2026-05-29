@@ -148,7 +148,7 @@ $current_page = $_GET['page'] ?? 'dashboard';
 
         <div class="logo-section">
             <!-- Added actual logo image -->
-            <img src="/BikriBazaar/public/assets/images/logo.png" alt="BikriBazaar Logo" class="logo-img"
+            <img src="<?php echo BASE_URL; ?>assets/images/logo.png" alt="BikriBazaar Logo" class="logo-img"
                  onerror="this.src='https://via.placeholder.com/42?text=BB'">
             <div class="logo-text">
                 <h2>Bikri Bazaar</h2>
