@@ -42,10 +42,12 @@ document.addEventListener("click", function(e){
     const productId = deleteBtn.dataset.id;
 
     const confirmDelete = confirm(
-        "Are you sure you want to delete this product?"
+        "Are you sure you want to move this advertisement to trash?"
     );
 
     if(!confirmDelete) return;
+
+    deleteBtn.disabled = true;
 
     fetch("./../modules/admin/ajax/delete_product.php", {
 
@@ -67,13 +69,23 @@ document.addEventListener("click", function(e){
 
             const row = deleteBtn.closest("tr");
 
-            row.remove();
+            row.style.transition = "all 0.3s ease";
+            row.style.opacity = "0";
+            row.style.transform = "translateX(20px)";
 
-            showToast("Product deleted successfully");
+            setTimeout(() => {
+
+                row.remove();
+
+            }, 300);
+
+            showToast("Advertisement moved to trash successfully");
 
         }else{
 
-            showToast("Failed to delete product","error");
+            deleteBtn.disabled = false;
+
+            showToast("Failed to delete advertisement","error");
 
         }
 
@@ -82,6 +94,8 @@ document.addEventListener("click", function(e){
     .catch(error => {
 
         console.error(error);
+
+        deleteBtn.disabled = false;
 
         showToast("Something went wrong","error");
 
