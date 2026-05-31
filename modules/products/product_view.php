@@ -102,6 +102,7 @@ $related_sql = "
     WHERE p.category = '$current_category' 
     AND p.id != $product_id 
     AND p.status = 'active' 
+    AND p.is_deleted = 0 
     ORDER BY RAND() 
     LIMIT 4"; // Show 4 random related ads
 

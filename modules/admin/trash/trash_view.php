@@ -151,7 +151,7 @@
 
     .action-buttons { display: flex; gap: 0.5rem; }
 
-    .restore-btn {
+    .admin-restore-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -168,7 +168,7 @@
         transition: all 0.2s;
     }
 
-    .restore-btn:hover {
+    .admin-restore-btn:hover {
         background: #059669;
         color: #fff;
         transform: translateY(-2px);
@@ -295,12 +295,17 @@
 
                 <td>
                     <div class="action-buttons">
+                        <?php if(isset($ad['deleted_by']) && $ad['deleted_by'] === 'user'): ?>
+                            <span style="font-size: 0.75rem; color: #6b7280; font-weight: 600; font-style: italic;">
+                                <i class="fa-solid fa-user-xmark" style="margin-right: 4px;"></i> Deleted by User
+                            </span>
+                        <?php else: ?>
                         <a href="#"
-   class="restore-btn"
-   data-id="<?php echo $ad['id']; ?>"
-                           onclick="event.stopImmediatePropagation(); return confirm('Are you sure you want to restore this advertisement?');">
+   class="admin-restore-btn"
+   data-id="<?php echo $ad['id']; ?>">
                             <i class="fa-solid fa-rotate-left"></i> Restore
                         </a>
+                        <?php endif; ?>
                     </div>
                 </td>
             </tr>
@@ -330,3 +335,43 @@
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.admin-restore-btn').forEach(button => {
+    // Changing from addEventListener to .onclick completely prevents double-stacking!
+    button.onclick = function(e) {
+        e.preventDefault(); // Stop the page from jumping to the top
+
+        if(!confirm('Are you sure you want to restore this advertisement?')) {
+            return;
+        }
+
+        const productId = this.getAttribute('data-id');
+        const originalHtml = this.innerHTML;
+        this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Restoring...';
+        this.style.pointerEvents = 'none'; // Prevents frantic double-clicking
+        
+        fetch('../modules/admin/ajax/restore_product.php', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'product_id=' + productId
+        })
+        .then(response => response.text())
+        .then(data => {
+            if(data.trim() === 'success') {
+                window.location.reload(); 
+            } else {
+                alert('Failed to restore ad. The server says:\n\n' + data);
+                this.innerHTML = originalHtml;
+                this.style.pointerEvents = 'auto';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred.');
+            this.innerHTML = originalHtml;
+            this.style.pointerEvents = 'auto';
+        });
+    };
+});
+</script>
