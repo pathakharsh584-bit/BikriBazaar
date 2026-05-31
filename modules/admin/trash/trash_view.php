@@ -282,17 +282,22 @@
                 </td>
 
                 <td>
-                    <?php if (!empty($ad['deleted_at'])): ?>
-                        <span class="date-text"><?php echo date('d M Y, h:i A', strtotime($ad['deleted_at'])); ?></span>
-                    <?php else: ?>
-                        <span class="unknown-date">Unknown Date</span>
-                    <?php endif; ?>
-                </td>
+    <?php
+    if (!empty($ad['deleted_at']) && $ad['deleted_at'] !== '0000-00-00 00:00:00') {
+        echo '<span class="date-text">' .
+             date('d M Y, h:i A', strtotime($ad['deleted_at'])) .
+             '</span>';
+    } else {
+        echo '<span class="date-text">Not Available</span>';
+    }
+    ?>
+</td>
 
                 <td>
                     <div class="action-buttons">
-                        <a href="admin_page.php?page=restore_ad&id=<?php echo $ad['id']; ?>"
-                           class="restore-btn"
+                        <a href="#"
+   class="restore-btn"
+   data-id="<?php echo $ad['id']; ?>"
                            onclick="event.stopImmediatePropagation(); return confirm('Are you sure you want to restore this advertisement?');">
                             <i class="fa-solid fa-rotate-left"></i> Restore
                         </a>
