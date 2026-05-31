@@ -12,7 +12,7 @@ $product_id = intval($_GET['id']);
 // This removes it from the public marketplace but keeps it in the database for the Admin's Deleted Ads list.
 mysqli_query(
     $conn,
-    "UPDATE products SET is_deleted = 1 WHERE id = $product_id"
+    "UPDATE products SET is_deleted = 1, deleted_at = NOW(), deleted_by = 'admin' WHERE id = $product_id"
 );
 
 /* 2. RETAIN THE REPORT EVIDENCE */

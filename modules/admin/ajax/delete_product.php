@@ -36,7 +36,8 @@ $delete_query = mysqli_query(
 
      SET 
         is_deleted = 1,
-        deleted_at = NOW()
+        deleted_at = NOW(),
+        deleted_by = 'admin'
 
      WHERE id = $product_id"
 

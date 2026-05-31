@@ -35,7 +35,7 @@ if(isset($_GET['id'])){
 
         // SOFT DELETE THE PRODUCT
         // Note: We DO NOT delete Cloudinary images here so the Admin can still see them in the recycle bin.
-        $del_sql = "UPDATE products SET is_deleted = 1 WHERE id = ? AND user_id = ?";
+        $del_sql = "UPDATE products SET is_deleted = 1, deleted_at = NOW(), deleted_by = 'user' WHERE id = ? AND user_id = ?";
         $del_stmt = mysqli_prepare($conn, $del_sql);
         
         if ($del_stmt) {
