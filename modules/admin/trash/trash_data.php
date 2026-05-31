@@ -62,6 +62,7 @@ $deleted_ads_query = mysqli_query(
         products.status,
         products.boost_type,
         products.deleted_at,
+        products.deleted_by,
         users.name AS seller_name,
         reported_ads.id AS was_reported,
         (SELECT image_path FROM product_images WHERE product_images.product_id = products.id LIMIT 1) AS image
