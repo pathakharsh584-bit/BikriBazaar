@@ -10,30 +10,28 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 // =========================
 
 $user_sql = "
-
     SELECT name, email
     FROM users
     WHERE id = ?
-
 ";
 
 $user_stmt = $conn->prepare($user_sql);
 
-$user_stmt->bind_param("i", $user_id);
-
-$user_stmt->execute();
-
-$user_result = $user_stmt->get_result();
-
-$user = $user_result->fetch_assoc();
-
-if (!$user) {
-
+if (!$user_stmt) {
     return;
 }
 
-$user_name = $user['name'];
+$user_stmt->bind_param("i", $user_id);
+$user_stmt->execute();
 
+$user_result = $user_stmt->get_result();
+$user = $user_result->fetch_assoc();
+
+if (!$user) {
+    return;
+}
+
+$user_name  = $user['name'];
 $user_email = $user['email'];
 
 // =========================
@@ -41,24 +39,39 @@ $user_email = $user['email'];
 // =========================
 
 $product_sql = "
-
     SELECT title
     FROM products
     WHERE id = ?
-
 ";
 
 $product_stmt = $conn->prepare($product_sql);
 
-$product_stmt->bind_param("i", $product_id);
+if (!$product_stmt) {
+    return;
+}
 
+$product_stmt->bind_param("i", $product_id);
 $product_stmt->execute();
 
 $product_result = $product_stmt->get_result();
-
 $product_data = $product_result->fetch_assoc();
 
 $product_title = $product_data['title'] ?? 'Product';
+
+// =========================
+// SAFE DEFAULTS
+// =========================
+
+$plan_name = $plan_name ?? 'Boost Plan';
+$amount = $amount ?? 0;
+
+$start_date = !empty($start_date)
+    ? date('d M Y, h:i A', strtotime($start_date))
+    : date('d M Y, h:i A');
+
+$boost_expiry = !empty($boost_expiry)
+    ? date('d M Y, h:i A', strtotime($boost_expiry))
+    : 'N/A';
 
 // =========================
 // MAILER
@@ -70,28 +83,34 @@ try {
 
     $mail->isSMTP();
 
-    $mail->Host = $_ENV['SMTP_HOST'];
-
+    $mail->Host = $_ENV['SMTP_HOST'] ?? 'smtp.gmail.com';
     $mail->SMTPAuth = true;
+    $mail->Username = $_ENV['SMTP_USERNAME'] ?? '';
+    $mail->Password = $_ENV['SMTP_PASSWORD'] ?? '';
 
-    $mail->Username = $_ENV['SMTP_USERNAME'];
+    $encryption = $_ENV['SMTP_SECURE'] ?? 'ssl';
 
-    $mail->Password = $_ENV['SMTP_PASSWORD'];
+    if ($encryption === 'tls') {
 
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = (int)($_ENV['SMTP_PORT'] ?? 587);
 
-    $mail->Port = (int)$_ENV['SMTP_PORT'];
+    } else {
+
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = (int)($_ENV['SMTP_PORT'] ?? 465);
+
+    }
+
+    $mail->CharSet = 'UTF-8';
 
     // =========================
     // SENDER
     // =========================
 
     $mail->setFrom(
-
-        $_ENV['SMTP_USERNAME'],
-
+        $_ENV['SMTP_USERNAME'] ?? 'noreply@bikribazaar.com',
         'BikriBazaar'
-
     );
 
     // =========================
@@ -99,11 +118,8 @@ try {
     // =========================
 
     $mail->addAddress(
-
         $user_email,
-
         $user_name
-
     );
 
     // =========================
@@ -112,22 +128,12 @@ try {
 
     $mail->isHTML(true);
 
-    $mail->Subject =
-        'Your Boost Plan Has Been Activated';
+    $mail->Subject = 'Your Boost Plan Has Been Activated';
 
     // =========================
     // BODY
     // =========================
-      
-$start_date = date(
-    'd M Y, h:i A',
-    strtotime($start_date)
-);
 
-$boost_expiry = date(
-    'd M Y, h:i A',
-    strtotime($boost_expiry)
-);
     $mail->Body = "
 
     <div style='
@@ -155,9 +161,7 @@ $boost_expiry = date(
                 color:#64748b;
                 font-size:16px;
             '>
-
                 Your boost plan has been activated successfully.
-
             </p>
 
         </div>
@@ -173,9 +177,7 @@ $boost_expiry = date(
                 margin-bottom:20px;
                 color:#0f172a;
             '>
-
                 Hello {$user_name},
-
             </h2>
 
             <p style='
@@ -183,10 +185,8 @@ $boost_expiry = date(
                 line-height:1.8;
                 margin-bottom:25px;
             '>
-
                 Your product boost payment was completed successfully.
                 Your advertisement is now boosted on BikriBazaar.
-
             </p>
 
             <table style='
@@ -195,118 +195,48 @@ $boost_expiry = date(
             '>
 
                 <tr>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                        font-weight:bold;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;font-weight:bold;'>
                         Product
-
                     </td>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;'>
                         {$product_title}
-
                     </td>
-
                 </tr>
 
                 <tr>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                        font-weight:bold;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;font-weight:bold;'>
                         Plan
-
                     </td>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;'>
                         {$plan_name}
-
                     </td>
-
                 </tr>
 
                 <tr>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                        font-weight:bold;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;font-weight:bold;'>
                         Amount Paid
-
                     </td>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;'>
                         ₹{$amount}
-
                     </td>
-
                 </tr>
 
                 <tr>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                        font-weight:bold;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;font-weight:bold;'>
                         Start Date
-
                     </td>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;'>
                         {$start_date}
-
                     </td>
-
                 </tr>
 
                 <tr>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                        font-weight:bold;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;font-weight:bold;'>
                         Expiry Date
-
                     </td>
-
-                    <td style='
-                        padding:14px;
-                        border:1px solid #e2e8f0;
-                    '>
-
+                    <td style='padding:14px;border:1px solid #e2e8f0;'>
                         {$boost_expiry}
-
                     </td>
-
                 </tr>
 
             </table>
@@ -326,9 +256,7 @@ $boost_expiry = date(
                         border-radius:10px;
                         font-weight:bold;
                    '>
-
                     Visit BikriBazaar
-
                 </a>
 
             </div>
@@ -339,16 +267,12 @@ $boost_expiry = date(
 
     ";
 
-    if($mail->send()){
+    $mail->send();
 
-        echo "PURCHASE MAIL SENT";
-
-    }else{
-
-        echo $mail->ErrorInfo;
-    }
+    echo "PURCHASE MAIL SENT";
 
 } catch (Exception $e) {
 
-    die($mail->ErrorInfo);
+    echo "MAIL ERROR: " . $mail->ErrorInfo;
+
 }

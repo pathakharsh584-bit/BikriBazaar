@@ -6,44 +6,43 @@ use PHPMailer\PHPMailer\Exception;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 $user_sql = "
-
     SELECT name, email
     FROM users
     WHERE id = ?
-
 ";
 
 $user_stmt = $conn->prepare($user_sql);
 
-$user_stmt->bind_param("i", $user_id);
+if (!$user_stmt) {
+    return;
+}
 
+$user_stmt->bind_param("i", $user_id);
 $user_stmt->execute();
 
 $user_result = $user_stmt->get_result();
-
 $user = $user_result->fetch_assoc();
 
 if (!$user) {
-
     return;
 }
 
 $user_name = $user['name'];
-
 $user_email = $user['email'];
 
 $product_sql = "
-
     SELECT title
     FROM products
     WHERE id = ?
-
 ";
 
 $product_stmt = $conn->prepare($product_sql);
 
-$product_stmt->bind_param("i", $product_id);
+if (!$product_stmt) {
+    return;
+}
 
+$product_stmt->bind_param("i", $product_id);
 $product_stmt->execute();
 
 $product_result = $product_stmt->get_result();
@@ -52,60 +51,62 @@ $product_data = $product_result->fetch_assoc();
 
 $product_title = $product_data['title'] ?? 'Product';
 
+$plan_name = $plan_name ?? 'Boost Plan';
+
+date_default_timezone_set('Asia/Kolkata');
+
+$boost_expiry = !empty($boost_expiry)
+    ? date('d M Y, h:i A', strtotime($boost_expiry))
+    : 'N/A';
+
 $mail = new PHPMailer(true);
 
 try {
 
     $mail->isSMTP();
 
-    $mail->Host = $_ENV['SMTP_HOST'];
-
+    $mail->Host = $_ENV['SMTP_HOST'] ?? 'smtp.gmail.com';
     $mail->SMTPAuth = true;
+    $mail->Username = $_ENV['SMTP_USERNAME'] ?? '';
+    $mail->Password = $_ENV['SMTP_PASSWORD'] ?? '';
 
-    $mail->Username = $_ENV['SMTP_USERNAME'];
+    $encryption = $_ENV['SMTP_SECURE'] ?? 'ssl';
 
-    $mail->Password = $_ENV['SMTP_PASSWORD'];
+    if ($encryption === 'tls') {
 
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = (int)($_ENV['SMTP_PORT'] ?? 587);
 
-    $mail->Port = (int)$_ENV['SMTP_PORT'];
+    } else {
+
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = (int)($_ENV['SMTP_PORT'] ?? 465);
+
+    }
+
+    $mail->CharSet = 'UTF-8';
 
     $mail->setFrom(
-
-        $_ENV['SMTP_USERNAME'],
-
+        $_ENV['SMTP_USERNAME'] ?? 'noreply@bikribazaar.com',
         'BikriBazaar'
-
     );
 
     $mail->addAddress(
-
         $user_email,
-
         $user_name
-
     );
 
     $mail->isHTML(true);
 
-    if ($plan_key === "demo") {
+    if (($plan_key ?? '') === "demo") {
 
-        $mail->Subject =
-            'Demo Boost Plan Expiry Notice';
+        $mail->Subject = 'Demo Boost Plan Expiry Notice';
 
     } else {
 
-        $mail->Subject =
-            'Your Boost Plan Will Expire Soon';
+        $mail->Subject = 'Your Boost Plan Will Expire Soon';
+
     }
-
-
-     date_default_timezone_set('Asia/Kolkata');
-
-$boost_expiry = date(
-    'd M Y, h:i A',
-    strtotime($boost_expiry)
-);
 
     $mail->Body = "
 
@@ -246,16 +247,12 @@ $boost_expiry = date(
 
     ";
 
-    if($mail->send()){
+    $mail->send();
 
-        echo "EXPIRY MAIL SENT";
-
-    }else{
-
-        echo $mail->ErrorInfo;
-    }
+    echo "EXPIRY MAIL SENT";
 
 } catch (Exception $e) {
 
-    die($mail->ErrorInfo);
+    echo "MAIL ERROR: " . $mail->ErrorInfo;
+
 }
