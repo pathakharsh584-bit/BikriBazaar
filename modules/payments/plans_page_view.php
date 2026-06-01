@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         :root {
-            --primary: #1a3fc4;
+                  --primary: #1a3fc4;
             --primary-dark: #1530a0;
             --teal: #0ea5a0;
             --teal-dark: #0b8a86;
