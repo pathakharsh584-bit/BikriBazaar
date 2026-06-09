@@ -56,7 +56,7 @@ OLX-REPLICA/
 ![System Design](asset/System%20Design.png)
 
 ## 🖥️ Landing Page
-![BikriBazaar Landing Page](readmeImages/Landing_Page.png)
+![BikriBazaar Landing Page](asset/Landing%20Page.png)
 
 
 
