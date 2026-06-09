@@ -1,3 +1,4 @@
 vendor/
 /public/uploads/products/*
 .env
+shared/isrgrootx1.pem
