@@ -49,3 +49,10 @@ OLX-REPLICA/
 ├── .env               # Environment variables (Database credentials, API keys)
 ├── composer.json      # PHP dependencies configuration
 └── README.md          # Project documentation
+
+---
+
+## 🗺️ System Design
+![System Design](readmeImages/System_Design.png)
+
+
