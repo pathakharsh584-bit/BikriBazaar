@@ -52,7 +52,10 @@ OLX-REPLICA/
 
 ---
 
-## 🗺️ System Design
-![System Design](readmeImages/System_Design.png)
+## 📐 System Design
+![System Design Architecture](https://raw.githubusercontent.com/pathakharsh584-bit/BikriBazaar/main/readmeImages/System_Design.png)
+
+## 💻 Landing Page
+![BikriBazaar Landing Page](https://raw.githubusercontent.com/pathakharsh584-bit/BikriBazaar/main/readmeImages/Landing_Page.png)
 
 
