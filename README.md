@@ -49,14 +49,3 @@ OLX-REPLICA/
 ├── .env               # Environment variables (Database credentials, API keys)
 ├── composer.json      # PHP dependencies configuration
 └── README.md          # Project documentation
-
----
-
-## 📐 System Design
-![System Design](./asset/System%20Design.png)
-
-## 🖥️ Landing Page
-![BikriBazaar Landing Page](./asset/landing_page.png)
-
-
-
