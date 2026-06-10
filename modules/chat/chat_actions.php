@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+date_default_timezone_set('Asia/Kolkata');
+
 require_once __DIR__ . '/../../shared/db.php';
 
 // Fail silently if unauthorized (AJAX will just receive empty data)
@@ -38,7 +41,11 @@ if ($action === 'fetch' && isset($_GET['product_id']) && isset($_GET['other_user
         $isMine = ($msg['sender_id'] == $current_user);
         $wrapperClass = $isMine ? 'my-wrapper' : 'other-wrapper';
         $msgClass = $isMine ? 'my-message' : 'other-message';
-        $time = date("h:i A", strtotime($msg['created_at']));
+        // Treat the database time as UTC, then convert to IST
+        $dt = new DateTime($msg['created_at'], new DateTimeZone('UTC'));
+        $dt->setTimezone(new DateTimeZone('Asia/Kolkata'));
+        $time = $dt->format("h:i A");
+    
         
         echo "
         <div class='message-wrapper {$wrapperClass}'>

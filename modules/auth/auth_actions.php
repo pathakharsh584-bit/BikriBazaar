@@ -110,6 +110,7 @@ function loginUser($conn)
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_email'] = $user['email'];
+            $_SESSION['profile_image'] = $user['profile_image'];    
 
             if ($is_ajax) {
                 // Send success JSON and exit immediately
