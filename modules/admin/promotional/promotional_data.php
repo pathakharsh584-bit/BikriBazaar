@@ -11,6 +11,8 @@ $promotional_query = mysqli_query(
      JOIN users ON products.user_id = users.id
      WHERE products.boost_type IS NOT NULL
      AND products.boost_type != ''
+     AND LOWER(products.boost_type) != 'free'
+     AND products.boost_expiry > NOW()
      AND products.is_deleted = 0
      ORDER BY products.created_at DESC"
 );

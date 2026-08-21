@@ -13,7 +13,7 @@ $total_ads_query = mysqli_query(
     $conn,
     "SELECT COUNT(*) AS total_ads 
      FROM products 
-     WHERE is_deleted = 0"
+     WHERE status = 'active' AND is_deleted = 0"
 );
 $total_ads = mysqli_fetch_assoc($total_ads_query)['total_ads'] ?? 0;
 
@@ -22,7 +22,10 @@ $premium_ads_query = mysqli_query(
     $conn,
     "SELECT COUNT(*) AS premium_ads
      FROM products
-     WHERE is_boosted = 1 
+     WHERE boost_type IS NOT NULL 
+     AND boost_type != '' 
+     AND LOWER(boost_type) != 'free'
+     AND boost_expiry > NOW() 
      AND is_deleted = 0"
 );
 $premium_ads = mysqli_fetch_assoc($premium_ads_query)['premium_ads'] ?? 0;

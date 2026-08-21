@@ -18,6 +18,10 @@ function postProduct($conn)
     $condition   = mysqli_real_escape_string($conn, trim($_POST['condition']));
     $price       = floatval($_POST['price']);
 
+    if(empty($_FILES['images']['name'][0])) {
+        return "Error: PHP did not receive any image file. Check file size or JavaScript.";
+    }
+
     // STEP 1: Insert the core product data first
     $sql = "INSERT INTO products 
             (user_id, title, description, price, city, location, `condition`, category) 

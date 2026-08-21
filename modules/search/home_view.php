@@ -220,6 +220,8 @@ AND (
     boost_type IS NULL
     OR boost_type = ''
     OR LOWER(boost_type) = 'free'
+    OR boost_expiry <= NOW()
+    OR boost_expiry IS NULL
 )
 
 ORDER BY RAND()
@@ -357,7 +359,12 @@ $basic_index   = 0;
 
 $cycle = 0;
 
-while($normal_index < count($normal_products)){
+while(
+    $normal_index < count($normal_products) ||
+    $premium_index < count($premium_products) ||
+    $special_index < count($special_products) ||
+    $basic_index < count($basic_products)
+){
 
     // 5 NORMAL PRODUCTS
 
